@@ -756,7 +756,7 @@ if [[ $experid == "1" && "$QQ" == "1" ]] ;then
 	echo -e "                                                     QQ號：2518583418"
 fi
 echo -e "                                                                Ver:$script_ver"
-echo -e "                                                         Author:Glass\n"
+echo -e "                                                         Author:skysumbra\n"
 }
 
 mytitle(){
