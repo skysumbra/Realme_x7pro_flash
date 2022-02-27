@@ -4,7 +4,7 @@
 - 支援的系統包：CN, PU, TW android 11
 
 ## 程式截圖
-![](https://i.ibb.co/F4HMGnh/demo.pngxxx)
+![](https://i.ibb.co/F4HMGnhx/demo.pngxxx)
 ### 參考項目
 1. [第三方整理包](https://realmefirmware.com/realme-x7-pro-5g-firmware/)
 2. Recovery
