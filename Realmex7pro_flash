@@ -1,5 +1,4 @@
 #!/bin/sh
-adb devices >/dev/null
 flg4="0"
 flg3="0"
 flg2="0"
@@ -756,11 +755,11 @@ if [[ $experid == "1" && "$QQ" == "1" ]] ;then
 	echo -e "                                                     QQ號：2518583418"
 fi
 echo -e "                                                                Ver:$script_ver"
-echo -e "                                                     Author:skysumbra\n"
+echo -e "                                                         Author:skysumbra\n"
 }
 
 mytitle(){
-clear
+
 echo -e "\t\t Realme X7 Pro fastboot flash Tool"
 echo
 echo -e "--------Please check usb debugging enable and fastboot unlock--------"
@@ -782,7 +781,7 @@ else
 	echo -e "" > /dev/null
 fi
 echo -e "                                                                Ver:$script_ver"
-echo -e "                                                         Author:skysumbra\n"
+echo -e "                                                     Author:skysumbra\n"
 
 }
 check_model(){
@@ -880,7 +879,28 @@ fi
 
 }
 
+ADBandfastboot_check(){
+localadb=`which adb | wc -L`
+localfastboot=`which adb | wc -L`
+
+if [[ $localadb != "" ]];then
+	adb --version
+else
+	echo "Not found ADB tool"
+	exit 1
+fi
+if [[ $localfastboot != "" ]];then
+	fastboot --version
+else
+	echo "Not found Fastboot tool"
+	echo "Please setup Fastboot tool"
+fi
+}
+
+
 main(){
+clear
+ADBandfastboot_check
 mytitle
 check_model
 phone_info_out
@@ -960,4 +980,3 @@ else
 	fi
 	
 fi
-
