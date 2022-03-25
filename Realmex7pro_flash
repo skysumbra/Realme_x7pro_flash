@@ -18,7 +18,7 @@ vendor_rom_OS=""
 battery_level=""
 QQ=0
 experid=1
-script_ver=6
+script_ver=7
 experid_date=31/5/2022
 rom_download_link(){
 echo ""
@@ -184,7 +184,8 @@ case $1 in
 esac
 }
 goflash_puc06(){
-adb -s $sn reboot bootloader && sleep 15
+	echo "Rebooting Device into Bootloader."
+	adb -s $sn reboot bootloader && sleep 15
 	fastboot -s $sn devices
 	sleep 3
 	fastboot -s $sn flash preloader ./pu/preloader_oppo6889.bin
@@ -218,9 +219,18 @@ adb -s $sn reboot bootloader && sleep 15
 	fastboot -s $sn flash dtbo ./pu/dtbo.img
 	fastboot -s $sn flash tee1 ./pu/tee.img
 	fastboot -s $sn flash tee2 ./pu/tee.img
+	echo "Rebooting Device into Userspace Fastboot"
+	fastboot -s $sn reboot fastboot && sleep 15
+	fastboot -s $sn devices
+	sleep 3
 	fastboot -s $sn flash super ./pu/super.0.d23cba54.img
 	fastboot -s $sn flash super ./pu/super.1.61441402.img
 	fastboot -s $sn flash super ./pu/super.2.362436ac.img
+	sleep 1
+	echo "Rebooting Device into Bootloader."
+	adb -s $sn reboot bootloader && sleep 15
+	fastboot -s $sn devices
+	sleep 3
 	fastboot -s $sn flash boot ./pu/boot.img
 	fastboot -s $sn flash recovery ./pu/recovery.img
 	fastboot -s $sn flash userdata userdata.img
@@ -230,6 +240,7 @@ adb -s $sn reboot bootloader && sleep 15
 }
 
 goflash_cnc15(){
+	echo "Rebooting Device into Bootloader."
 	adb -s $sn reboot bootloader && sleep 15
 	fastboot -s $sn devices
 	sleep 3
@@ -264,9 +275,18 @@ goflash_cnc15(){
 	fastboot -s $sn flash dtbo ./cn/dtbo.img
 	fastboot -s $sn flash tee1 ./cn/tee.img
 	fastboot -s $sn flash tee2 ./cn/tee.img
+	echo "Rebooting Device into Userspace Fastboot"
+	fastboot -s $sn reboot fastboot && sleep 15
+	fastboot -s $sn devices
+	sleep 3
 	fastboot -s $sn flash super ./cn/super.0.ad887076.img
 	fastboot -s $sn flash super ./cn/super.1.5ab600a6.img
 	fastboot -s $sn flash super ./cn/super.2.ce0fab33.img
+s	sleep 1
+	echo "Rebooting Device into Bootloader."
+	adb -s $sn reboot bootloader && sleep 15
+	fastboot -s $sn devices
+	sleep 3
 	fastboot -s $sn flash boot ./cn/boot.img
 	fastboot -s $sn flash recovery ./cn/recovery.img
 	fastboot -s $sn flash userdata ./cn/userdata.img
@@ -276,6 +296,7 @@ goflash_cnc15(){
 }
 
 goflash_twc06(){
+	echo "Rebooting Device into Bootloader."
 	adb -s $sn reboot bootloader && sleep 15
 	fastboot -s $sn devices
 	sleep 3
@@ -310,11 +331,20 @@ goflash_twc06(){
 	fastboot -s $sn flash dtbo ./tw/dtbo.img
 	fastboot -s $sn flash tee1 ./tw/tee.img
 	fastboot -s $sn flash tee2 ./tw/tee.img
+	echo "Rebooting Device into Userspace Fastboot"	
+	fastboot -s $sn reboot fastboot && sleep 15
+	fastboot -s $sn devices
+	sleep 3
 	fastboot -s $sn flash super ./tw/super.0.4963b3cf.img
 	fastboot -s $sn flash super ./tw/super.1.48eb2998.img
 	fastboot -s $sn flash super ./tw/super.2.4aaccf0e.img
 	fastboot -s $sn flash super ./tw/super.2.e0c313e9.img
 	fastboot -s $sn flash super ./tw/super.2.f992f79c.img
+	sleep 1
+	echo "Rebooting Device into Bootloader."
+	adb -s $sn reboot bootloader && sleep 15
+	fastboot -s $sn devices
+	sleep 3
 	fastboot -s $sn flash boot ./tw/boot.img
 	fastboot -s $sn flash recovery ./tw/recovery.img
 	fastboot -s $sn flash userdata ./tw/userdata.img
@@ -335,6 +365,7 @@ case $1 in
 	;;
 	$choise)
 	product_UIversion=$choise
+	echo "Rebooting Device into Bootloader."
 	adb -s $sn reboot bootloader && sleep 15
 	fastboot -s $sn devices
 	sleep 3
@@ -369,7 +400,15 @@ case $1 in
 	fastboot -s $sn flash dtbo ./$product_UIversion/dtbo.img
 	fastboot -s $sn flash tee1 ./$product_UIversion/tee.img
 	fastboot -s $sn flash tee2 ./$product_UIversion/tee.img
+	echo "Rebooting Device into Userspace Fastboot"
+	fastboot -s $sn reboot fastboot && sleep 15
+	fastboot -s $sn devices
+	sleep 3
 	fastboot -s $sn flash super ./$product_UIversion/super.img
+	echo "Rebooting Device into Bootloader."
+	adb -s $sn reboot bootloader && sleep 15
+	fastboot -s $sn devices
+	sleep 3
 	fastboot -s $sn flash boot ./$product_UIversion/boot.img
 	fastboot -s $sn flash recovery ./$product_UIversion/recovery.img
 	#fastboot -s $sn flash userdata ./$product_UIversion/userdata.img
@@ -706,28 +745,31 @@ phoneinfo()
 }
 
 phone_info_out(){
-	printf "check root:"
+	printf "Check root:"
 	echo -e "\e[32m$check_root \e[0m"
-	printf "market_name:"
+	if [[ $market_name == ""  ]];then
+		market_name=`adb -s $sn shell getprop ro.vendor.oplus.market.name`
+	fi
+	printf "Market name:"
 	echo -e "\e[32m$market_name \e[0m"
-	printf "android OS:"
+	printf "Android OS:"
 	echo -e "\e[32m$vendor_rom_OS \e[0m"
 	printf "odm:"
 	echo -e "\e[32m$odm \e[0m"
 	printf "band:"
 	echo -e "\e[32m$band \e[0m"
-	if [[ $vendor_rom == ""  ]];then
+	if [[ $ui_version != ""  ]];then
 		printf "realmeUI:"
 		echo -e "\e[32m$ui_version \e[0m"
-		printf "vender_ROM:"
+		printf "Vender ROM:"
 		echo -e "\e[32m$product_UIversion \e[0m"
 	else
-		printf "vender_ROM:"
+		printf "Vender ROM:"
 		echo -e "\e[32m$vendor_rom \e[0m"
 	fi	
-	printf "system_ROM:"
+	printf "System ROM:"
 	echo -e "\e[32m$product_build \e[0m"
-	printf "phone battery:"
+	printf "Phone battery:"
 	echo -e "\e[32m$battery_level% \e[0m"
 
 }
@@ -887,13 +929,15 @@ if [[ $localadb != "" ]];then
 	adb --version
 else
 	echo "Not found ADB tool"
+	echo "Do you not install or set global variable ?"
 	exit 1
 fi
 if [[ $localfastboot != "" ]];then
 	fastboot --version
 else
 	echo "Not found Fastboot tool"
-	echo "Please setup Fastboot tool"
+	echo "Do you not install or set global variable ?"
+	exit 1
 fi
 }
 
@@ -941,42 +985,49 @@ do
 done
 }
 
-if [ -z "$1" ];then
-	main
+case $1 in
+	$1)
+		platform=`uname -m`
+		if [ -z "$1" ];then
+			
+			
+			main
 
-else
-	if [[ "$1" == "" || "$1" == "-h" || "$1" == "--h" || "$1" == "-help" ]];then
-		myhelp
-	elif [[ "$1" == "--info" || "$1" == "-I" ]];then
-		check_model
-		phone_info_out
-	elif [[ "$1" == "--flashos" || "$1" == "-FO" ]];then
-		check_model
-		foldercheck_
-		flash_rom
-	elif [[ "$1" == "--backup" || "$1" == "-B" ]];then
-		check_model
-		backup_all_img
-	elif [[ "$1" == "--clone" || "$1" == "-C" ]];then
-		check_model
-		clone_image
-		echo -e "\e[33mPlease rember to change folder name.\e[0m"
-	elif [[ "$1" == "--flashre" || "$1" == "-R" ]];then
-		check_model
-		flash_recovery
-	elif [[ "$1" == "--flashfs" || "$1" == "-FF" ]];then
-		check_model
-		flash_fastboot
-	elif [[ "$1" == "--link" || "$1" == "-L" ]];then
-		rom_download_link
-	elif [[ "$1" == "--pkg" || "$1" == "-P" ]];then
-		ota_path
-	elif [[ "$1" == "--boot" || "$1" == "-b" ]];then
-		check_model
-		flash_official_boot
-		
-	else
-		myhelp
-	fi
-	
-fi
+		else
+			if [[ "$1" == "" || "$1" == "-h" || "$1" == "--h" || "$1" == "-help" ]];then
+				myhelp
+			elif [[ "$1" == "--info" || "$1" == "-I" ]];then
+				check_model
+				phone_info_out
+			elif [[ "$1" == "--flashos" || "$1" == "-FO" ]];then
+				check_model
+				foldercheck_
+				flash_rom
+			elif [[ "$1" == "--backup" || "$1" == "-B" ]];then
+				check_model
+				backup_all_img
+			elif [[ "$1" == "--clone" || "$1" == "-C" ]];then
+				check_model
+				clone_image
+				echo -e "\e[33mPlease rember to change folder name.\e[0m"
+			elif [[ "$1" == "--flashre" || "$1" == "-R" ]];then
+				check_model
+				flash_recovery
+			elif [[ "$1" == "--flashfs" || "$1" == "-FF" ]];then
+				check_model
+				flash_fastboot
+			elif [[ "$1" == "--link" || "$1" == "-L" ]];then
+				rom_download_link
+			elif [[ "$1" == "--pkg" || "$1" == "-P" ]];then
+				ota_path
+			elif [[ "$1" == "--boot" || "$1" == "-b" ]];then
+				check_model
+				flash_official_boot
+				
+			else
+				myhelp
+			fi
+			
+		fi
+	;;
+esac
