@@ -985,49 +985,41 @@ do
 done
 }
 
-case $1 in
-	$1)
-		platform=`uname -m`
-		if [ -z "$1" ];then
-			
-			
-			main
-
-		else
-			if [[ "$1" == "" || "$1" == "-h" || "$1" == "--h" || "$1" == "-help" ]];then
-				myhelp
-			elif [[ "$1" == "--info" || "$1" == "-I" ]];then
-				check_model
-				phone_info_out
-			elif [[ "$1" == "--flashos" || "$1" == "-FO" ]];then
-				check_model
-				foldercheck_
-				flash_rom
-			elif [[ "$1" == "--backup" || "$1" == "-B" ]];then
-				check_model
-				backup_all_img
-			elif [[ "$1" == "--clone" || "$1" == "-C" ]];then
-				check_model
-				clone_image
-				echo -e "\e[33mPlease rember to change folder name.\e[0m"
-			elif [[ "$1" == "--flashre" || "$1" == "-R" ]];then
-				check_model
-				flash_recovery
-			elif [[ "$1" == "--flashfs" || "$1" == "-FF" ]];then
-				check_model
-				flash_fastboot
-			elif [[ "$1" == "--link" || "$1" == "-L" ]];then
-				rom_download_link
-			elif [[ "$1" == "--pkg" || "$1" == "-P" ]];then
-				ota_path
-			elif [[ "$1" == "--boot" || "$1" == "-b" ]];then
-				check_model
-				flash_official_boot
-				
-			else
-				myhelp
-			fi
-			
-		fi
-	;;
-esac
+if [ -z "$1" ];then	
+	main
+else
+	if [[ "$1" == "" || "$1" == "-h" || "$1" == "--h" || "$1" == "-help" ]];then
+		myhelp
+	elif [[ "$1" == "--info" || "$1" == "-I" ]];then
+		check_model
+		phone_info_out
+	elif [[ "$1" == "--flashos" || "$1" == "-FO" ]];then
+		check_model
+		foldercheck_
+		flash_rom
+	elif [[ "$1" == "--backup" || "$1" == "-B" ]];then
+		check_model
+		backup_all_img
+	elif [[ "$1" == "--clone" || "$1" == "-C" ]];then
+		check_model
+		clone_image
+		echo -e "\e[33mPlease rember to change folder name.\e[0m"
+	elif [[ "$1" == "--flashre" || "$1" == "-R" ]];then
+		check_model
+		flash_recovery
+	elif [[ "$1" == "--flashfs" || "$1" == "-FF" ]];then
+		check_model
+		flash_fastboot
+	elif [[ "$1" == "--link" || "$1" == "-L" ]];then
+		rom_download_link
+	elif [[ "$1" == "--pkg" || "$1" == "-P" ]];then
+		ota_path
+	elif [[ "$1" == "--boot" || "$1" == "-b" ]];then
+		check_model
+		flash_official_boot
+		
+	else
+		myhelp
+	fi
+	
+fi
