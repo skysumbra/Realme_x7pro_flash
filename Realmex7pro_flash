@@ -628,7 +628,6 @@ do
 			adb -s $sn pull /sdcard/$i.img ./$Mybackup_folder > /dev/null
 			adb -s $sn shell rm /sdcard/$i.img
 		elif [[ $i = logo ]]; then
-			echo "The img is bigger, wait..."
 			adb -s $sn shell "su -c 'dd if=/dev/block/by-name/$i of=/sdcard/$i.bin'" 2> /dev/null
 			adb -s $sn pull /sdcard/$i.bin ./$Mybackup_folder > /dev/null
 			adb -s $sn shell rm /sdcard/$i.bin	
