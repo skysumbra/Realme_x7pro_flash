@@ -803,8 +803,7 @@ echo -e "\e[33mStart tool time：\033[1;36m`date '+%d-%m-%Y %H:%M:%S'`\e[0m"
 		phoneinfo $sn
 	elif [[  $connect1 -gt 0 ]] ;then
 		fastboot devices
-		read -p "SN: " sn		
-		product_UIversion=`adb -s $sn shell getprop ro.build.display.id`
+		read -p "SN: " sn
 	else 
 		echo -e "\e[33mPC doesn't connect device.\e[0m"
 		exit 1
