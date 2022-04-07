@@ -3,22 +3,9 @@ flg4="0"
 flg3="0"
 flg2="0"
 flg1="0"
-B=""
-A=""
-sn=""
-choise=""
-market_name=""
-ui_version=""
-odm=""
-band=""
-vendor_rom=""
-product_build=""
-product_UIversion=""
-vendor_rom_OS=""
-battery_level=""
-QQ=0
-experid=1
-script_ver=7
+QQ=1
+experid=0
+script_ver=8
 experid_date=31/5/2022
 rom_download_link(){
 echo ""
@@ -27,14 +14,14 @@ echo -e "REF:https://realmefirmware.com/realme-x7-pro-5g-firmware/"
 echo -e "\e[33mPU C06 ROM link(need convert tool and use fastboot flash):\e[0m"
 echo -e "https://fileload.coloros.com/504342RMX2121export_11_C.06_2021121711130172.zip"
 echo -e "\e[33mPU C03 ROM link:\e[0m"
-echo -e "\e[33m(Need editor line1 line2 of /META-INF/com/google/android/updater-script file and use rec or spf tool flash\e[0m"
+echo -e "\e[33m(Need editor check function of /META-INF/com/google/android/updater-script file and use rec or spf tool flash\e[0m"
 echo -e "https://phoenixnap.dl.sourceforge.net/project/sarthak-android-projects/d-ozip/RMX2121PU_11_OTA_10300270_all_J3fsF9l1Qrs3.zip"
-echo -e "\e[32mTW C06 ROM link(need convert tool use fastboot flash):\e[0m"
+echo -e "\e[32mTW C06 ROM link(need convert tool use fastboot flash, this version should rollback android 12):\e[0m"
 echo -e "https://fileload.coloros.com/504343RMX2121export_11_C.06_2021121711100174.zip"
-echo -e "\e[31mCN C23 and C24 ROM link:\e[0m"
-echo -e "\e[31m(Use local update for file put in CN model phone or use spf tool flash)\e[0m"
+echo -e "\e[31mCN C23 to C25 ROM link:\e[0m"
+echo -e "\e[31m(Use 3rd rec flash)\e[0m"
 echo -e "https://docs.google.com/spreadsheets/d/1dTkrGBjyXIiUYYGj27Hg5wy4GZiO-jDG7c49LTX8DCk/edit?usp=sharing"
-echo -e "\e[31mCN C15 ROM link(use fastboot flash):\e[0m"
+echo -e "\e[31mCN C15 ROM link(use fastboot flash, this version should rollback android 12):\e[0m"
 echo -e "https://drive.google.com/drive/folders/1871KTAH6gYvziEfiLSlZx-Gd1b2vufta?usp=sharing"
 echo -e "\e[31mCN C08 ROM link(use 3rd rec flash):\e[0m"
 echo -e "https://otaafs-cost.coloros.com/RMX2121/RMX2121_11.C.08_10801510_202101271138/patch/CHN/RMX2121/RMX2121_11.C.08_10801510_202101271138/RMX2121_11_OTA_10801510_all_voiS7xmS7Cze_03d6cb.ozip"
@@ -47,7 +34,6 @@ echo ""
 opf_covcert
 echo ""
 echo "Maybe you need x7 pro UI1 bootloader img."
-#echo -e "https://drive.google.com/drive/folders/1N-tXSi_xeIzI7-sU2HMWjK4BLJxi82vt?usp=sharing"
 echo -e "https://www.mediafire.com/file/y6vhxdludzq9w5h/realme_x7_pro_UI_1_bootloader.zip/file"
 }
 
@@ -62,9 +48,9 @@ echo -e "https://github.com/PitchBlackRecoveryProject/android_device_realme_RMX2
 
 opf_covcert(){
 echo -e "Maybe you need convert tool."
-echo -e "ofp tool"
+echo -e "\e[36mofp tool\e[0m"
 echo -e "https://github.com/bkerler/oppo_decrypt"
-echo -e "ozip tool"
+echo -e "\e[36mozip tool\e[0m"
 echo -e "https://github.com/bkerler/oppo_ozip_decrypt"
 }
 
@@ -219,18 +205,9 @@ goflash_puc06(){
 	fastboot -s $sn flash dtbo ./pu/dtbo.img
 	fastboot -s $sn flash tee1 ./pu/tee.img
 	fastboot -s $sn flash tee2 ./pu/tee.img
-	echo "Rebooting Device into Userspace Fastboot"
-	fastboot -s $sn reboot fastboot && sleep 15
-	fastboot -s $sn devices
-	sleep 3
 	fastboot -s $sn flash super ./pu/super.0.d23cba54.img
 	fastboot -s $sn flash super ./pu/super.1.61441402.img
 	fastboot -s $sn flash super ./pu/super.2.362436ac.img
-	sleep 1
-	echo "Rebooting Device into Bootloader."
-	adb -s $sn reboot bootloader && sleep 15
-	fastboot -s $sn devices
-	sleep 3
 	fastboot -s $sn flash boot ./pu/boot.img
 	fastboot -s $sn flash recovery ./pu/recovery.img
 	fastboot -s $sn flash userdata userdata.img
@@ -275,18 +252,9 @@ goflash_cnc15(){
 	fastboot -s $sn flash dtbo ./cn/dtbo.img
 	fastboot -s $sn flash tee1 ./cn/tee.img
 	fastboot -s $sn flash tee2 ./cn/tee.img
-	echo "Rebooting Device into Userspace Fastboot"
-	fastboot -s $sn reboot fastboot && sleep 15
-	fastboot -s $sn devices
-	sleep 3
 	fastboot -s $sn flash super ./cn/super.0.ad887076.img
 	fastboot -s $sn flash super ./cn/super.1.5ab600a6.img
 	fastboot -s $sn flash super ./cn/super.2.ce0fab33.img
-s	sleep 1
-	echo "Rebooting Device into Bootloader."
-	adb -s $sn reboot bootloader && sleep 15
-	fastboot -s $sn devices
-	sleep 3
 	fastboot -s $sn flash boot ./cn/boot.img
 	fastboot -s $sn flash recovery ./cn/recovery.img
 	fastboot -s $sn flash userdata ./cn/userdata.img
@@ -331,20 +299,11 @@ goflash_twc06(){
 	fastboot -s $sn flash dtbo ./tw/dtbo.img
 	fastboot -s $sn flash tee1 ./tw/tee.img
 	fastboot -s $sn flash tee2 ./tw/tee.img
-	echo "Rebooting Device into Userspace Fastboot"	
-	fastboot -s $sn reboot fastboot && sleep 15
-	fastboot -s $sn devices
-	sleep 3
 	fastboot -s $sn flash super ./tw/super.0.4963b3cf.img
 	fastboot -s $sn flash super ./tw/super.1.48eb2998.img
 	fastboot -s $sn flash super ./tw/super.2.4aaccf0e.img
 	fastboot -s $sn flash super ./tw/super.2.e0c313e9.img
 	fastboot -s $sn flash super ./tw/super.2.f992f79c.img
-	sleep 1
-	echo "Rebooting Device into Bootloader."
-	adb -s $sn reboot bootloader && sleep 15
-	fastboot -s $sn devices
-	sleep 3
 	fastboot -s $sn flash boot ./tw/boot.img
 	fastboot -s $sn flash recovery ./tw/recovery.img
 	fastboot -s $sn flash userdata ./tw/userdata.img
@@ -796,7 +755,7 @@ if [[ $experid == "1" && "$QQ" == "1" ]] ;then
 	echo -e "                                                     QQ號：2518583418"
 fi
 echo -e "                                                                Ver:$script_ver"
-echo -e "                                                         Author:skysumbra\n"
+echo -e "                                                     Author:skysumbra\n"
 }
 
 mytitle(){
@@ -827,78 +786,58 @@ echo -e "                                                     Author:skysumbra\n
 }
 check_model(){
 echo -e "\e[33mStart tool time：\033[1;36m`date '+%d-%m-%Y %H:%M:%S'`\e[0m"
-	connect1=`adb devices | grep device | awk 'NR!=1 {print $1}'| wc -l`
-	connect2=`adb devices | grep recovery | awk '{print $1}'| wc -l`
+	connect1=`fastboot devices | grep fastboot | awk '{print $1}'| wc -l`
+	connect2=`adb devices | grep device | awk 'NR!=1 {print $1}'| wc -l`
+	connect3=`adb devices | grep recovery | awk '{print $1}'| wc -l`
 	
-	if [[ $connect1 -gt 0 ]] ;then
+	if [[ $connect2 -gt 0 || $connect3 -gt 0 ]] ;then
 		adb devices
 		read -p "SN: " sn
-		if [[ `adb -s $sn shell "su -c 'whoami'"` == "root" ]];then
+		if [[ `adb -s $sn shell which su` == "" ]];then
+			check_root="not root"
+		elif [[ `adb -s $sn shell "su -c 'whoami'"` == "root" ]];then
 			check_root="rooted"
 		else
 			check_root="not root"
 		fi
-
-		adb -s $sn shell getprop ro.product.device > /dev/null
-			if [[ $? -eq 0  ]];then
-				phoneinfo $sn
-			else
-				echo -e "\e[31mInput error\e[0m"
-				exit 1
-			fi
-		
-	elif [[  $connect2 -gt 0 ]] ;then
-		adb devices
-		read -p "SN: " sn
-		if [[ `adb -s $sn shell "su -c 'whoami'"` == "root" ]];then
-			echo "Device is root"
-		else
-			echo "Device is not root"
-		fi
-			if [[ $? -eq 0  ]];then
-				echo "" > /dev/null
-			else
-				echo -e "\e[31mInput error\e[0m"
-				exit 1
-			fi
-
-		sn=`adb devices| grep recovery | awk '{print $1}'`
-		#phoneinfo $sn
-		product_UIversion=`adb -s $sn shell getprop ro.build.display.id | awk '{print $3}'`
+		phoneinfo $sn
+	elif [[  $connect1 -gt 0 ]] ;then
+		fastboot devices
+		read -p "SN: " sn		
+		product_UIversion=`adb -s $sn shell getprop ro.build.display.id`
 	else 
-		echo -e "\e[33mPC doesn't connect devices.\e[0m"
-		echo -e "\e[33m电脑没有抓到装置\e[0m"
+		echo -e "\e[33mPC doesn't connect device.\e[0m"
 		exit 1
 		
 	fi
 
 
-		device=`adb -s $sn shell getprop ro.product.device`
-		if [[ $device == "RMX2121" || $device == "RMX2121CN" || $device == "RMX2121TW" || $device == "RMX2121L1" || $device == "RMX2121PU" ]];then
-		vendor_rom_OS=`adb -s $sn shell getprop ro.build.version.release`
-			if [[ $vendor_rom_OS -le 10 ]];then
-			echo -e "\e[31mYour devices OS not support,please manually update to android  11.\n\e[0m"
-			echo -e "\e[31m你的裝置系統不支持，請手動更新系統版本至android 11。\n\e[0m"
-			exit 1
-			fi
-		else
-		echo -e "\e[33mModel is not match,exit.\e[0m"
+	device=`adb -s $sn shell getprop ro.product.device`
+	if [[ $device == "RMX2121" || $device == "RMX2121CN" || $device == "RMX2121TW" || $device == "RMX2121L1" || $device == "RMX2121PU" ]];then
+	vendor_rom_OS=`adb -s $sn shell getprop ro.build.version.release`
+		if [[ $vendor_rom_OS -le 10 ]];then
+		echo -e "\e[31mYour devices OS not support,please manually update to android  11.\n\e[0m"
+		echo -e "\e[31m你的裝置系統不支持，請手動更新系統版本至android 11。\n\e[0m"
 		exit 1
 		fi
+	else
+		echo -e "\e[33mModel is not match,exit.\e[0m"
+		exit 1
+	fi
 
 }
 
 ota_path(){
-	echo "Color OS OTA link path"
-	echo -e "\e[32mUI 1.0\e[0m"
 	echo "OTA link path"
-	echo "DB:/data/data/com.oppo.ota/databases/ota.db-wal"
+	echo -e "\e[32mUI 1.0\e[0m"
+	echo "DB:/data/data/com.oppo.ota/databases/"
 	echo "ROM:/data/oppo/coloros/OTA/.otaPackage/"
 	echo -e "\e[32mUI 2.0\e[0m"
-	echo "OTA link path"
-	echo "DB:/data/data/com.oppo.ota/databases/ota.db-wal"
+	echo "DB:/data/data/com.oppo.ota/databases/"
 	echo "ROM:/data/ota_package/"
-	
+	echo -e "\e[32mUI 3.0\e[0m"
+	echo "DB:/data/data/com.oplus.ota/databases/"
+	echo "ROM:/data/ota_package/OTA/.otaPackage/"
 }
 
 flash_official_boot(){
@@ -988,7 +927,9 @@ if [ -z "$1" ];then
 	main
 else
 	if [[ "$1" == "" || "$1" == "-h" || "$1" == "--h" || "$1" == "-help" ]];then
+		clear
 		myhelp
+		rom_download_link
 	elif [[ "$1" == "--info" || "$1" == "-I" ]];then
 		check_model
 		phone_info_out
@@ -1018,7 +959,9 @@ else
 		flash_official_boot
 		
 	else
+		clear
 		myhelp
+		rom_download_link
 	fi
 	
 fi
