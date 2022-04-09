@@ -800,7 +800,7 @@ mytitle(){
 echo -e "\t\t Realme X7 Pro fastboot flash Tool"
 echo
 echo -e "--------Please check usb debugging enable and fastboot unlock--------"
-echo -e "This Tool for realme android 11 Only or rariants custom 11 after"
+echo -e "This Tool for realme android 11 after or rariants custom 11 after"
 echo -e "    ----Please put rom img file under pu, tw or cn folder----"
 echo -e "\e[33mPU:Free and Open Indo-Pacific used UI2 c06 version\e[0m"
 echo -e "    https://www.realme.com/in/realme-x7-pro/specs"
