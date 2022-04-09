@@ -5,21 +5,23 @@ flg2="0"
 flg1="0"
 QQ=1
 experid=0
-script_ver=8
+script_ver=9
 experid_date=31/5/2022
 rom_download_link(){
 echo ""
 echo -e "Maybe you need rom link."
+echo -e "C:android 11, F:android 12"
 echo -e "REF:https://realmefirmware.com/realme-x7-pro-5g-firmware/"
-echo -e "\e[33mPU C06 ROM link(need convert tool and use fastboot flash):\e[0m"
+echo -e "\e[36mGobal F06 ROM link(need convert tool and use fastboot flash):\e[0m"
+echo -e "http://rms01.realme.net/SW/realme%20service/realme%20X7%20Pro%205G/20660/RMX2121export_11_F.06_2022032603170488.zip"
+echo -e "\e[36mGobal C06 ROM link(need convert tool and use fastboot flash):\e[0m"
 echo -e "https://fileload.coloros.com/504342RMX2121export_11_C.06_2021121711130172.zip"
 echo -e "\e[33mPU C03 ROM link:\e[0m"
 echo -e "\e[33m(Need editor check function of /META-INF/com/google/android/updater-script file and use rec or spf tool flash\e[0m"
 echo -e "https://phoenixnap.dl.sourceforge.net/project/sarthak-android-projects/d-ozip/RMX2121PU_11_OTA_10300270_all_J3fsF9l1Qrs3.zip"
 echo -e "\e[32mTW C06 ROM link(need convert tool use fastboot flash, this version should rollback android 12):\e[0m"
 echo -e "https://fileload.coloros.com/504343RMX2121export_11_C.06_2021121711100174.zip"
-echo -e "\e[31mCN C23 to C25 ROM link:\e[0m"
-echo -e "\e[31m(Use 3rd rec flash)\e[0m"
+echo -e "\e[31mCN C23 to C25 ROM link(use 3rd rec flash)):\e[0m"
 echo -e "https://docs.google.com/spreadsheets/d/1dTkrGBjyXIiUYYGj27Hg5wy4GZiO-jDG7c49LTX8DCk/edit?usp=sharing"
 echo -e "\e[31mCN C15 ROM link(use fastboot flash, this version should rollback android 12):\e[0m"
 echo -e "https://drive.google.com/drive/folders/1871KTAH6gYvziEfiLSlZx-Gd1b2vufta?usp=sharing"
@@ -56,7 +58,7 @@ echo -e "https://github.com/bkerler/oppo_ozip_decrypt"
 
 foldercheck_(){
 printf "Directory chick...\n"
-	if [[ -d ./tw || -d ./pu || -d ./cn ]];then
+	if [[ -d ./Globalc06 || -d ./CNc15 || -d PUc03 ]];then
 		echo "" > /dev/null
 	else
 		echo -e "\e[31mNot found folder, create folder.\e[0m"
@@ -64,19 +66,19 @@ printf "Directory chick...\n"
 		rom_download_link
 
 
-		mkdir tw && mkdir pu && mkdir cn
+		mkdir Globalc06 && mkdir CNc15 && mkdir PUc03
 		exit 1
 		fi
 B=`ls`
 for A in $B;
 do
-if [[ -d $A  && "$A" == "tw" ]]; then
+if [[ -d $A  && "$A" == "Globalc06" ]]; then
 	echo -e "\e[32m $A directory existed\e[0m"
 	imgcheck_ $A
-elif  [[ -d $A && "$A" == "pu" ]]; then
+elif  [[ -d $A  && "$A" == "CNc15" ]]; then
 	echo -e "\e[32m $A directory existed\e[0m"
 	imgcheck_ $A
-elif  [[ -d $A  && "$A" == "cn" ]]; then
+elif  [[ -d $A  && "$A" == "PUc03" ]]; then
 	echo -e "\e[32m $A directory existed\e[0m"
 	imgcheck_ $A
 elif  [[ -d "$A" && "$A" == *RMX* ]]; then
@@ -95,15 +97,13 @@ done
 
 imgcheck_(){
 case $1 in
-	pu)
+	PUc03)
 	#echo PU
-	cnimg=`ls ./pu | grep "img"| wc -l`
-	cnbin=`ls ./pu | grep "bin"| wc -l`
+	cnimg=`ls ./PUc03 | grep "img"| wc -l`
+	cnbin=`ls ./PUc03 | grep "bin"| wc -l`
 	if [[ $cnimg != 0 && $cnbin != 0 ]];then
-		#echo -e "$cnimg img file"
-		#echo -e "$cnbin bin file"
-		if [[ -f ./pu/super.1.61441402.img && -f ./tw/tee.img ]];then
-			echo -e "\e[32m   pu C06 version found\n\e[0m"
+		if [[ -f ./PUc03/super.1.61441402.img && -f ./PUc03/tee.img ]];then
+			echo -e "\e[32m   PUc03 version found\n\e[0m"
 			flg1=1
 		else
 			echo "Not support version,please put in correct version."
@@ -114,33 +114,44 @@ case $1 in
 	cnimg=0
 	cnbin=0
 	;;
-	tw)
+	Globalc06)
 	#echo TW
-	cnimg=`ls ./tw | grep "img"| wc -l`
-	cnbin=`ls ./tw | grep "bin"| wc -l`
+	cnimg=`ls ./Globalc06 | grep "img"| wc -l`
+	cnbin=`ls ./Globalc06 | grep "bin"| wc -l`
 	if [[ $cnimg != 0 && $cnbin != 0 ]];then
-		#echo -e "$cnimg img file"
-		#echo -e "$cnbin bin file"
-		if [[ -f ./tw/super.2.e0c313e9.img && -f ./tw/tee.img ]];then
-			echo -e "\e[32m   tw C06 version found\n\e[0m"
+		if [[ -f ./Globalc06/super.2.e0c313e9.img && -f ./Globalc06/tee.img ]];then
+			echo -e "\e[32m   MYC06 version found\n\e[0m"
 			flg2=1
 		else
 				echo "Not support version,please put in correct version."
 		fi
+		if [[ -f ./Globalc06/super.2.f992f79c.img && -f ./Globalc06/tee.img ]];then
+			echo -e "\e[32m   TWC06 version found\n\e[0m"
+			flg5=1
+		else
+				echo "Not support version,please put in correct version."
+		fi
+		if [[ -f ./Globalc06/super.2.4aaccf0e.img && -f ./Globalc06/tee.img ]];then
+			echo -e "\e[32m   THC06 version found\n\e[0m"
+			flg6=1
+		else
+				echo "Not support version,please put in correct version."
+		fi		
 	else
 		echo -e "\e[31m＝＝＞ Not found rom img.\n\e[0m"
 	fi
+	
 	cnimg=0
 	cnbin=0
 	;;
-	cn)
+	CNc15)
 	#echo CN
-	cnimg=`ls ./cn | grep "img"| wc -l`
-	cnbin=`ls ./cn | grep "bin"| wc -l`
+	cnimg=`ls ./CNc15 | grep "img"| wc -l`
+	cnbin=`ls ./CNc15 | grep "bin"| wc -l`
 	if [[ $cnimg != 0 && $cnbin != 0 ]];then
 		#echo -e "$cnimg img file"
 		#echo -e "$cnbin bin file"
-		if [[ -f ./cn/super.1.5ab600a6.img && ./cn/tee.img ]];then
+		if [[ -f ./CNc15/super.1.5ab600a6.img && ./CNc15/tee.img ]];then
 			echo -e "\e[32m   cn C15 version found\n\e[0m"
 			flg3=1
 		else
@@ -169,144 +180,163 @@ case $1 in
 	;;
 esac
 }
-goflash_puc06(){
-	echo "Rebooting Device into Bootloader."
-	adb -s $sn reboot bootloader && sleep 15
+flash_puc03(){
+	if [[  $connect2 -gt 0 || $connect3 -gt 0  ]];then
+		echo "Rebooting Device into Bootloader."
+		adb -s $sn reboot bootloader && sleep 20
+	fi
 	fastboot -s $sn devices
+	echo "wait 3 sec..."
 	sleep 3
-	fastboot -s $sn flash preloader ./pu/preloader_oppo6889.bin
-	fastboot -s $sn flash opporeserve2 ./pu/opporeserve2.img
-	fastboot -s $sn flash vbmeta ./pu/vbmeta.img
-	fastboot -s $sn flash vbmeta_system ./pu/vbmeta_system.img
-	fastboot -s $sn flash vbmeta_vendor ./pu/vbmeta_vendor.img
-	fastboot -s $sn flash special_preload ./pu/special_preload.img
-	fastboot -s $sn flash my_custom ./pu/my_custom.img
-	fastboot -s $sn flash cdt_engineering ./pu/cdt_engineering.img
-	fastboot -s $sn flash md1img ./pu/md1img.img
-	fastboot -s $sn flash spmfw ./pu/spmfw.img
-	fastboot -s $sn flash audio_dsp ./pu/audio_dsp.img
-	fastboot -s $sn flash pi_img ./pu/pi_img.img
-	fastboot -s $sn flash dpm_1 ./pu/dpm.img
-	fastboot -s $sn flash dpm_2 ./pu/dpm.img
-	fastboot -s $sn flash scp1 ./pu/scp.img
-	fastboot -s $sn flash scp2 ./pu/scp.img
-	fastboot -s $sn flash sspm_1 ./pu/sspm.img
-	fastboot -s $sn flash sspm_2 ./pu/sspm.img
-	fastboot -s $sn flash mcupm_1 ./pu/mcupm.img
-	fastboot -s $sn flash mcupm_2 ./pu/mcupm.img
-	fastboot -s $sn flash cam_vpu1 ./pu/cam_vpu1.img
-	fastboot -s $sn flash cam_vpu2 ./pu/cam_vpu2.img
-	fastboot -s $sn flash cam_vpu3 ./pu/cam_vpu3.img
-	fastboot -s $sn flash gz1 ./pu/gz.img
-	fastboot -s $sn flash gz2 ./pu/gz.img
-	fastboot -s $sn flash lk ./pu/lk.img
-	fastboot -s $sn flash lk2 ./pu/lk.img
-	fastboot -s $sn flash logo ./pu/logo.bin
-	fastboot -s $sn flash dtbo ./pu/dtbo.img
-	fastboot -s $sn flash tee1 ./pu/tee.img
-	fastboot -s $sn flash tee2 ./pu/tee.img
-	fastboot -s $sn flash super ./pu/super.0.d23cba54.img
-	fastboot -s $sn flash super ./pu/super.1.61441402.img
-	fastboot -s $sn flash super ./pu/super.2.362436ac.img
-	fastboot -s $sn flash boot ./pu/boot.img
-	fastboot -s $sn flash recovery ./pu/recovery.img
+	fastboot -s $sn flash preloader ./PUc03/preloader_oppo6889.bin
+	fastboot -s $sn flash opporeserve2 ./PUc03/opporeserve2.img
+	fastboot -s $sn flash vbmeta ./PUc03/vbmeta.img
+	fastboot -s $sn flash vbmeta_system ./PUc03/vbmeta_system.img
+	fastboot -s $sn flash vbmeta_vendor ./PUc03/vbmeta_vendor.img
+	fastboot -s $sn flash special_preload ./PUc03/special_preload.img
+	fastboot -s $sn flash my_custom ./PUc03/my_custom.img
+	fastboot -s $sn flash cdt_engineering ./PUc03/cdt_engineering.img
+	fastboot -s $sn flash md1img ./PUc03/md1img.img
+	fastboot -s $sn flash spmfw ./PUc03/spmfw.img
+	fastboot -s $sn flash audio_dsp ./PUc03/audio_dsp.img
+	fastboot -s $sn flash pi_img ./PUc03/pi_img.img
+	fastboot -s $sn flash dpm_1 ./PUc03/dpm.img
+	fastboot -s $sn flash dpm_2 ./PUc03/dpm.img
+	fastboot -s $sn flash scp1 ./PUc03/scp.img
+	fastboot -s $sn flash scp2 ./PUc03/scp.img
+	fastboot -s $sn flash sspm_1 ./PUc03/sspm.img
+	fastboot -s $sn flash sspm_2 ./PUc03/sspm.img
+	fastboot -s $sn flash mcupm_1 ./PUc03/mcupm.img
+	fastboot -s $sn flash mcupm_2 ./PUc03/mcupm.img
+	fastboot -s $sn flash cam_vpu1 ./PUc03/cam_vpu1.img
+	fastboot -s $sn flash cam_vpu2 ./PUc03/cam_vpu2.img
+	fastboot -s $sn flash cam_vpu3 ./PUc03/cam_vpu3.img
+	fastboot -s $sn flash gz1 ./PUc03/gz.img
+	fastboot -s $sn flash gz2 ./PUc03/gz.img
+	fastboot -s $sn flash lk ./PUc03/lk.img
+	fastboot -s $sn flash lk2 ./PUc03/lk.img
+	fastboot -s $sn flash logo ./PUc03/logo.bin
+	fastboot -s $sn flash dtbo ./PUc03/dtbo.img
+	fastboot -s $sn flash tee1 ./PUc03/tee.img
+	fastboot -s $sn flash tee2 ./PUc03/tee.img
+	fastboot -s $sn flash super ./PUc03/super.0.d23cba54.img
+	fastboot -s $sn flash super ./PUc03/super.1.61441402.img
+	fastboot -s $sn flash super ./PUc03/super.2.362436ac.img
+	fastboot -s $sn flash boot ./PUc03/boot.img
+	fastboot -s $sn flash recovery ./PUc03/recovery.img
 	fastboot -s $sn flash userdata userdata.img
 	fastboot -s $sn erase userdata
 	sleep 1
 	fastboot -s $sn reboot
 }
 
-goflash_cnc15(){
-	echo "Rebooting Device into Bootloader."
-	adb -s $sn reboot bootloader && sleep 15
+flash_cnc15(){
+	if [[  $connect2 -gt 0 || $connect3 -gt 0  ]];then
+		echo "Rebooting Device into Bootloader."
+		adb -s $sn reboot bootloader && sleep 20
+	fi
 	fastboot -s $sn devices
+	echo "wait 3 sec..."
 	sleep 3
-	fastboot -s $sn flash preloader ./cn/preloader_oppo6889.bin
-	fastboot -s $sn flash opporeserve2 ./cn/opporeserve2.img
-	fastboot -s $sn flash vbmeta ./cn/vbmeta.img
-	fastboot -s $sn flash vbmeta_system ./cn/vbmeta_system.img
-	fastboot -s $sn flash vbmeta_vendor ./cn/vbmeta_vendor.img
-	fastboot -s $sn flash special_preload ./cn/special_preload.img
-	fastboot -s $sn flash my_custom ./cn/my_custom.img
-	fastboot -s $sn flash cdt_engineering ./cn/cdt_engineering.img
-	fastboot -s $sn flash md1img ./cn/md1img.img
-	fastboot -s $sn flash spmfw ./cn/spmfw.img
-	fastboot -s $sn flash audio_dsp ./cn/audio_dsp.img
-	fastboot -s $sn flash pi_img ./cn/pi_img.img
-	fastboot -s $sn flash dpm_1 ./cn/dpm.img
-	fastboot -s $sn flash dpm_2 ./cn/dpm.img
-	fastboot -s $sn flash scp1 ./cn/scp.img
-	fastboot -s $sn flash scp2 ./cn/scp.img
-	fastboot -s $sn flash sspm_1 ./cn/sspm.img
-	fastboot -s $sn flash sspm_2 ./cn/sspm.img
-	fastboot -s $sn flash mcupm_1 ./cn/mcupm.img
-	fastboot -s $sn flash mcupm_2 ./cn/mcupm.img
-	fastboot -s $sn flash cam_vpu1 ./cn/cam_vpu1.img
-	fastboot -s $sn flash cam_vpu2 ./cn/cam_vpu2.img
-	fastboot -s $sn flash cam_vpu3 ./cn/cam_vpu3.img
-	fastboot -s $sn flash gz1 ./cn/gz.img
-	fastboot -s $sn flash gz2 ./cn/gz.img
-	fastboot -s $sn flash lk ./cn/lk.img
-	fastboot -s $sn flash lk2 ./cn/lk.img
-	fastboot -s $sn flash logo ./cn/logo.bin
-	fastboot -s $sn flash dtbo ./cn/dtbo.img
-	fastboot -s $sn flash tee1 ./cn/tee.img
-	fastboot -s $sn flash tee2 ./cn/tee.img
-	fastboot -s $sn flash super ./cn/super.0.ad887076.img
-	fastboot -s $sn flash super ./cn/super.1.5ab600a6.img
-	fastboot -s $sn flash super ./cn/super.2.ce0fab33.img
-	fastboot -s $sn flash boot ./cn/boot.img
-	fastboot -s $sn flash recovery ./cn/recovery.img
-	fastboot -s $sn flash userdata ./cn/userdata.img
+	fastboot -s $sn flash preloader ./CNc15/preloader_oppo6889.bin
+	fastboot -s $sn flash opporeserve2 ./CNc15/opporeserve2.img
+	fastboot -s $sn flash vbmeta ./CNc15/vbmeta.img
+	fastboot -s $sn flash vbmeta_system ./CNc15/vbmeta_system.img
+	fastboot -s $sn flash vbmeta_vendor ./CNc15/vbmeta_vendor.img
+	fastboot -s $sn flash special_preload ./CNc15/special_preload.img
+	fastboot -s $sn flash my_custom ./CNc15/my_custom.img
+	fastboot -s $sn flash cdt_engineering ./CNc15/cdt_engineering.img
+	fastboot -s $sn flash md1img ./CNc15/md1img.img
+	fastboot -s $sn flash spmfw ./CNc15/spmfw.img
+	fastboot -s $sn flash audio_dsp ./CNc15/audio_dsp.img
+	fastboot -s $sn flash pi_img ./CNc15/pi_img.img
+	fastboot -s $sn flash dpm_1 ./CNc15/dpm.img
+	fastboot -s $sn flash dpm_2 ./CNc15/dpm.img
+	fastboot -s $sn flash scp1 ./CNc15/scp.img
+	fastboot -s $sn flash scp2 ./CNc15/scp.img
+	fastboot -s $sn flash sspm_1 ./CNc15/sspm.img
+	fastboot -s $sn flash sspm_2 ./CNc15/sspm.img
+	fastboot -s $sn flash mcupm_1 ./CNc15/mcupm.img
+	fastboot -s $sn flash mcupm_2 ./CNc15/mcupm.img
+	fastboot -s $sn flash cam_vpu1 ./CNc15/cam_vpu1.img
+	fastboot -s $sn flash cam_vpu2 ./CNc15/cam_vpu2.img
+	fastboot -s $sn flash cam_vpu3 ./CNc15/cam_vpu3.img
+	fastboot -s $sn flash gz1 ./CNc15/gz.img
+	fastboot -s $sn flash gz2 ./CNc15/gz.img
+	fastboot -s $sn flash lk ./CNc15/lk.img
+	fastboot -s $sn flash lk2 ./CNc15/lk.img
+	fastboot -s $sn flash logo ./CNc15/logo.bin
+	fastboot -s $sn flash dtbo ./CNc15/dtbo.img
+	fastboot -s $sn flash tee1 ./CNc15/tee.img
+	fastboot -s $sn flash tee2 ./CNc15/tee.img
+	fastboot -s $sn flash super ./CNc15/super.0.ad887076.img
+	fastboot -s $sn flash super ./CNc15/super.1.5ab600a6.img
+	fastboot -s $sn flash super ./CNc15/super.2.ce0fab33.img
+	fastboot -s $sn flash boot ./CNc15/boot.img
+	fastboot -s $sn flash recovery ./CNc15/recovery.img
+	fastboot -s $sn flash userdata ./CNc15/userdata.img
 	fastboot -s $sn erase userdata
 	sleep 1
 	fastboot -s $sn reboot
 }
 
-goflash_twc06(){
-	echo "Rebooting Device into Bootloader."
-	adb -s $sn reboot bootloader && sleep 15
+flash_globalc06(){
+	if [[  $connect2 -gt 0 || $connect3 -gt 0  ]];then
+		echo "Rebooting Device into Bootloader."
+		adb -s $sn reboot bootloader && sleep 20
+	fi
 	fastboot -s $sn devices
+	echo "wait 3 sec..."
 	sleep 3
-	fastboot -s $sn flash preloader ./tw/preloader_oppo6889.bin
-	fastboot -s $sn flash opporeserve2 ./tw/opporeserve2.img
-	fastboot -s $sn flash vbmeta ./tw/vbmeta.img
-	fastboot -s $sn flash vbmeta_system ./tw/vbmeta_system.img
-	fastboot -s $sn flash vbmeta_vendor ./tw/vbmeta_vendor.img
-	fastboot -s $sn flash special_preload ./tw/special_preload.img
-	fastboot -s $sn flash my_custom ./tw/my_custom.img
-	fastboot -s $sn flash cdt_engineering ./tw/cdt_engineering.img
-	fastboot -s $sn flash md1img ./tw/md1img.img
-	fastboot -s $sn flash spmfw ./tw/spmfw.img
-	fastboot -s $sn flash audio_dsp ./tw/audio_dsp.img
-	fastboot -s $sn flash pi_img ./tw/pi_img.img
-	fastboot -s $sn flash dpm_1 ./tw/dpm.img
-	fastboot -s $sn flash dpm_2 ./tw/dpm.img
-	fastboot -s $sn flash scp1 ./tw/scp.img
-	fastboot -s $sn flash scp2 ./tw/scp.img
-	fastboot -s $sn flash sspm_1 ./tw/sspm.img
-	fastboot -s $sn flash sspm_2 ./tw/sspm.img
-	fastboot -s $sn flash mcupm_1 ./tw/mcupm.img
-	fastboot -s $sn flash mcupm_2 ./tw/mcupm.img
-	fastboot -s $sn flash cam_vpu1 ./tw/cam_vpu1.img
-	fastboot -s $sn flash cam_vpu2 ./tw/cam_vpu2.img
-	fastboot -s $sn flash cam_vpu3 ./tw/cam_vpu3.img
-	fastboot -s $sn flash gz1 ./tw/gz.img
-	fastboot -s $sn flash gz2 ./tw/gz.img
-	fastboot -s $sn flash lk ./tw/lk.img
-	fastboot -s $sn flash lk2 ./tw/lk.img
-	fastboot -s $sn flash logo ./tw/logo.bin
-	fastboot -s $sn flash dtbo ./tw/dtbo.img
-	fastboot -s $sn flash tee1 ./tw/tee.img
-	fastboot -s $sn flash tee2 ./tw/tee.img
-	fastboot -s $sn flash super ./tw/super.0.4963b3cf.img
-	fastboot -s $sn flash super ./tw/super.1.48eb2998.img
-	fastboot -s $sn flash super ./tw/super.2.4aaccf0e.img
-	fastboot -s $sn flash super ./tw/super.2.e0c313e9.img
-	fastboot -s $sn flash super ./tw/super.2.f992f79c.img
-	fastboot -s $sn flash boot ./tw/boot.img
-	fastboot -s $sn flash recovery ./tw/recovery.img
-	fastboot -s $sn flash userdata ./tw/userdata.img
+	fastboot -s $sn flash preloader ./Globalc06/preloader_oppo6889.bin
+	fastboot -s $sn flash opporeserve2 ./Globalc06/opporeserve2.img
+	fastboot -s $sn flash vbmeta ./Globalc06/vbmeta.img
+	fastboot -s $sn flash vbmeta_system ./Globalc06/vbmeta_system.img
+	fastboot -s $sn flash vbmeta_vendor ./Globalc06/vbmeta_vendor.img
+	fastboot -s $sn flash special_preload ./Globalc06/special_preload.img
+	fastboot -s $sn flash my_custom ./Globalc06/my_custom.img
+	fastboot -s $sn flash cdt_engineering ./Globalc06/cdt_engineering.img
+	fastboot -s $sn flash md1img ./Globalc06/md1img.img
+	fastboot -s $sn flash spmfw ./Globalc06/spmfw.img
+	fastboot -s $sn flash audio_dsp ./Globalc06/audio_dsp.img
+	fastboot -s $sn flash pi_img ./Globalc06/pi_img.img
+	fastboot -s $sn flash dpm_1 ./Globalc06/dpm.img
+	fastboot -s $sn flash dpm_2 ./Globalc06/dpm.img
+	fastboot -s $sn flash scp1 ./Globalc06/scp.img
+	fastboot -s $sn flash scp2 ./Globalc06/scp.img
+	fastboot -s $sn flash sspm_1 ./Globalc06/sspm.img
+	fastboot -s $sn flash sspm_2 ./Globalc06/sspm.img
+	fastboot -s $sn flash mcupm_1 ./Globalc06/mcupm.img
+	fastboot -s $sn flash mcupm_2 ./Globalc06/mcupm.img
+	fastboot -s $sn flash cam_vpu1 ./Globalc06/cam_vpu1.img
+	fastboot -s $sn flash cam_vpu2 ./Globalc06/cam_vpu2.img
+	fastboot -s $sn flash cam_vpu3 ./Globalc06/cam_vpu3.img
+	fastboot -s $sn flash gz1 ./Globalc06/gz.img
+	fastboot -s $sn flash gz2 ./Globalc06/gz.img
+	fastboot -s $sn flash lk ./Globalc06/lk.img
+	fastboot -s $sn flash lk2 ./Globalc06/lk.img
+	fastboot -s $sn flash logo ./Globalc06/logo.bin
+	fastboot -s $sn flash dtbo ./Globalc06/dtbo.img
+	fastboot -s $sn flash tee1 ./Globalc06/tee.img
+	fastboot -s $sn flash tee2 ./Globalc06/tee.img
+	if [[ $1 == "tw" ]];then
+		fastboot -s $sn flash super ./Globalc06/super.0.4963b3cf.img
+		fastboot -s $sn flash super ./Globalc06/super.1.48eb2998.img
+		fastboot -s $sn flash super ./Globalc06/super.2.f992f79c.img
+	elif [[ $1 == "my" ]];then
+		echo "my~"
+		fastboot -s $sn flash super ./Globalc06/super.0.4963b3cf.img
+		fastboot -s $sn flash super ./Globalc06/super.1.48eb2998.img
+		fastboot -s $sn flash super ./Globalc06/super.2.e0c313e9.img
+	else
+		echo "th~"
+		fastboot -s $sn flash super ./Globalc06/super.0.4963b3cf.img
+		fastboot -s $sn flash super ./Globalc06/super.1.48eb2998.img
+		fastboot -s $sn flash super ./Globalc06/super.2.4aaccf0e.img
+	fi
+	fastboot -s $sn flash boot ./Globalc06/boot.img
+	fastboot -s $sn flash recovery ./Globalc06/recovery.img
+	fastboot -s $sn flash userdata ./Globalc06/userdata.img
 	fastboot -s $sn erase userdata
 	sleep 1
 	fastboot -s $sn reboot
@@ -314,18 +344,18 @@ goflash_twc06(){
 goflash(){
 case $1 in
 	pu)
-		goflash_puc06
+		flash_puc03
 	;;
-	tw)
-		goflash_twc06
+	my | tw | th )
+		flash_globalc06 $1
 	;;
 	cn)
-		goflash_cnc15
+		flash_cnc15
 	;;
 	$choise)
 	product_UIversion=$choise
 	echo "Rebooting Device into Bootloader."
-	adb -s $sn reboot bootloader && sleep 15
+	adb -s $sn reboot bootloader && sleep 20
 	fastboot -s $sn devices
 	sleep 3
 	fastboot -s $sn flash preloader ./$product_UIversion/preloader_oppo6889.bin
@@ -360,12 +390,12 @@ case $1 in
 	fastboot -s $sn flash tee1 ./$product_UIversion/tee.img
 	fastboot -s $sn flash tee2 ./$product_UIversion/tee.img
 	echo "Rebooting Device into Userspace Fastboot"
-	fastboot -s $sn reboot fastboot && sleep 15
+	fastboot -s $sn reboot fastboot && sleep 20
 	fastboot -s $sn devices
 	sleep 3
 	fastboot -s $sn flash super ./$product_UIversion/super.img
 	echo "Rebooting Device into Bootloader."
-	adb -s $sn reboot bootloader && sleep 15
+	adb -s $sn reboot bootloader && sleep 20
 	fastboot -s $sn devices
 	sleep 3
 	fastboot -s $sn flash boot ./$product_UIversion/boot.img
@@ -379,9 +409,6 @@ esac
 }
 
 flash_rom(){
-#echo "flg1=$flg1"
-#echo "flg2=$flg2"
-#echo "flg3=$flg3"
 if [[ $flg1 == "0" &&  $flg2 == "0" && $flg3 == "0" &&  $flg4 == "0" ]];then
 	echo -e "\e[33mNot found Rom img, please put img in specified path.\e[0m"
 	rom_download_link
@@ -394,7 +421,7 @@ else
 		echo "PU"
 	fi
 	if [[ $flg2 == "1" ]] ;then
-		echo "TW"
+		echo "MY"
 	fi
 	if [[ $flg3 == "1" ]] ;then
 		echo "CN"
@@ -402,20 +429,31 @@ else
 	if [[ $flg4 == "1" ]] ;then
 		ls | grep RMX
 	fi
+	if [[ $flg5 == "1" ]] ;then
+		echo "TW"
+	fi
+	if [[ $flg6 == "1" ]] ;then
+		echo "TH"
+	fi
 	echo "-----"
 	read -p "Version: " choise
 	if [[ $choise == "pu" || $choise == "PU" || $choise == "Pu" || $choise == "pU" ]] ;then
-		#echo "pu"
 		goflash pu
 		echo -e "\e[32mDone\e[0m"
 		echo "wait about 3 minutes go into OS"
 	elif [[ $choise == "tw" || $choise == "TW" || $choise == "Tw" || $choise == "tW" ]] ;then
-		#echo "tw"
 		goflash tw
 		echo -e "\e[32mDone\e[0m"
 		echo "wait about 3 minutes go into OS"
+	elif [[ $choise == "th" || $choise == "TH" || $choise == "Th" || $choise == "tH" ]] ;then
+		goflash th
+		echo -e "\e[32mDone\e[0m"
+		echo "wait about 3 minutes go into OS"
+	elif [[ $choise == "my" || $choise == "MY" || $choise == "My" || $choise == "mY" ]] ;then
+		goflash my
+		echo -e "\e[32mDone\e[0m"
+		echo "wait about 3 minutes go into OS"
 	elif [[ $choise == "cn" || $choise == "CN" || $choise == "Cn" || $choise == "cN" ]] ;then
-		#echo "cn"
 		goflash cn
 		echo -e "\e[32mDone\e[0m"
 		echo "wait about 3 minutes go into OS"
@@ -426,7 +464,6 @@ else
 		echo "wait about 3 minutes go into OS"
 	else
 		echo -e "\e[31mInput error.\n\e[0m"
-		#exit 1
 	fi
 fi
 
@@ -623,7 +660,7 @@ else
 	if [[ -f ./$used_recovery ]];then
 	
 		echo -e "\nRestart bootloader..."
-		adb -s $sn reboot bootloader && sleep 15
+		adb -s $sn reboot bootloader && sleep 20
 		fastboot -s $sn devices
 		sleep 3
 		echo -e "Flash recovery..."
@@ -635,7 +672,7 @@ else
 		
 		backup_boot_recovery_vbmeta
 		#echo -e "Restart bootloader..."
-		#adb -s $sn reboot bootloader && sleep 15
+		#adb -s $sn reboot bootloader && sleep 20
 		#echo -e "Disable AVB2.0..."
 		#fastboot -s $sn --disable-verity --disable-verification flash vbmeta \
 		#./$Mybackup_folder/vbmeta.img > /dev/null 
@@ -657,7 +694,7 @@ fi
 flash_fastboot(){
 if [[ -f ./bootloader.emmc.win && ./bootloader2.emmc.win ]];then
 	echo -e "Restart fastbootd..."
-	adb -s $sn reboot fastboot && sleep 15
+	adb -s $sn reboot fastboot && sleep 20
 	fastboot -s $sn devices
 	sleep 3
 	fastboot -s $sn flash bootloader bootloader.emmc.win
@@ -793,6 +830,19 @@ echo -e "\e[33mStart tool time：\033[1;36m`date '+%d-%m-%Y %H:%M:%S'`\e[0m"
 	if [[ $connect2 -gt 0 || $connect3 -gt 0 ]] ;then
 		adb devices
 		read -p "SN: " sn
+		device=`adb -s $sn shell getprop ro.product.device`
+		if [[ $device == "RMX2121" || $device == "RMX2121CN" || $device == "RMX2121TW" || $device == "RMX2121L1" || $device == "RMX2121PU" ]];then
+			vendor_rom_OS=`adb -s $sn shell getprop ro.build.version.release`
+		if [[ $vendor_rom_OS -le 10 ]];then
+			echo -e "\e[31mYour device OS not support,please manually update to android  11.\n\e[0m"
+			echo -e "\e[31m你的裝置系統不支持，請手動更新系統版本至android 11。\n\e[0m"
+			exit 1
+		fi
+	else
+		echo -e "\e[33mModel is not match,exit.\e[0m"
+		exit 1
+	fi
+		
 		if [[ `adb -s $sn shell which su` == "" ]];then
 			check_root="not root"
 		elif [[ `adb -s $sn shell "su -c 'whoami'"` == "root" ]];then
@@ -803,27 +853,17 @@ echo -e "\e[33mStart tool time：\033[1;36m`date '+%d-%m-%Y %H:%M:%S'`\e[0m"
 		phoneinfo $sn
 	elif [[  $connect1 -gt 0 ]] ;then
 		fastboot devices
-		read -p "SN: " sn
+		read -p "SN(q button:exit): " sn
+		if [[ $sn == "q" || $sn == "Q" ]];then
+			echo -e "\e[33mExit\e[0m"
+			exit 1
+		fi
+		main
 	else 
 		echo -e "\e[33mPC doesn't connect device.\e[0m"
 		exit 1
 		
 	fi
-
-
-	device=`adb -s $sn shell getprop ro.product.device`
-	if [[ $device == "RMX2121" || $device == "RMX2121CN" || $device == "RMX2121TW" || $device == "RMX2121L1" || $device == "RMX2121PU" ]];then
-	vendor_rom_OS=`adb -s $sn shell getprop ro.build.version.release`
-		if [[ $vendor_rom_OS -le 10 ]];then
-		echo -e "\e[31mYour devices OS not support,please manually update to android  11.\n\e[0m"
-		echo -e "\e[31m你的裝置系統不支持，請手動更新系統版本至android 11。\n\e[0m"
-		exit 1
-		fi
-	else
-		echo -e "\e[33mModel is not match,exit.\e[0m"
-		exit 1
-	fi
-
 }
 
 ota_path(){
@@ -843,7 +883,7 @@ flash_official_boot(){
 if [[ -d ./${product_UIversion}_official_img_backup && -f ./${product_UIversion}_official_img_backup/boot.img && -f ./${product_UIversion}_official_img_backup/vbmeta.img ]]; then
 	echo "Recovery official boot"
 	echo -e "Restart fastboot..."
-	adb -s $sn reboot bootloader && sleep 15
+	adb -s $sn reboot bootloader && sleep 20
 	fastboot -s $sn devices
 	sleep 1
 	fastboot -s $sn flash vbmeta ./${product_UIversion}_official_img_backup/vbmeta.img  2> /dev/null 
@@ -877,14 +917,16 @@ else
 	exit 1
 fi
 }
-
-
-main(){
+maintop(){
 clear
 ADBandfastboot_check
 mytitle
 check_model
 phone_info_out
+main
+}
+
+main(){
 foldercheck_
 
 while [[ true ]]
@@ -923,7 +965,7 @@ done
 }
 
 if [ -z "$1" ];then	
-	main
+	maintop
 else
 	if [[ "$1" == "" || "$1" == "-h" || "$1" == "--h" || "$1" == "-help" ]];then
 		clear
@@ -942,7 +984,7 @@ else
 	elif [[ "$1" == "--clone" || "$1" == "-C" ]];then
 		check_model
 		clone_image
-		echo -e "\e[33mPlease rember to change folder name.\e[0m"
+		echo -e "\e[33mPlease remeber to change folder name.\e[0m"
 	elif [[ "$1" == "--flashre" || "$1" == "-R" ]];then
 		check_model
 		flash_recovery
@@ -962,5 +1004,4 @@ else
 		myhelp
 		rom_download_link
 	fi
-	
 fi
