@@ -14,13 +14,13 @@ echo -e "C:android 11, F:android 12"
 echo -e "REF:https://realmefirmware.com/realme-x7-pro-5g-firmware/"
 echo -e "\e[36mGobal F06 ROM link(need convert tool and use fastboot flash):\e[0m"
 echo -e "http://rms01.realme.net/SW/realme%20service/realme%20X7%20Pro%205G/20660/RMX2121export_11_F.06_2022032603170488.zip"
-echo -e "\e[36mGobal C06 ROM link(need convert tool and use fastboot flash):\e[0m"
+echo -e "\e[36mIN C06 ROM link(need convert tool and use fastboot flash, this version should rollback android 12):\e[0m"
 echo -e "https://fileload.coloros.com/504342RMX2121export_11_C.06_2021121711130172.zip"
+echo -e "\e[32mGlobal C06(TW, MY, TH) ROM link(need convert tool use fastboot flash, this version should rollback android 12):\e[0m"
+echo -e "https://fileload.coloros.com/504343RMX2121export_11_C.06_2021121711100174.zip"
 echo -e "\e[33mPU C03 ROM link:\e[0m"
 echo -e "\e[33m(Need editor check function of /META-INF/com/google/android/updater-script file and use rec or spf tool flash\e[0m"
 echo -e "https://phoenixnap.dl.sourceforge.net/project/sarthak-android-projects/d-ozip/RMX2121PU_11_OTA_10300270_all_J3fsF9l1Qrs3.zip"
-echo -e "\e[32mTW C06 ROM link(need convert tool use fastboot flash, this version should rollback android 12):\e[0m"
-echo -e "https://fileload.coloros.com/504343RMX2121export_11_C.06_2021121711100174.zip"
 echo -e "\e[31mCN C23 to C25 ROM link(use 3rd rec flash)):\e[0m"
 echo -e "https://docs.google.com/spreadsheets/d/1dTkrGBjyXIiUYYGj27Hg5wy4GZiO-jDG7c49LTX8DCk/edit?usp=sharing"
 echo -e "\e[31mCN C15 ROM link(use fastboot flash, this version should rollback android 12):\e[0m"
@@ -58,7 +58,7 @@ echo -e "https://github.com/bkerler/oppo_ozip_decrypt"
 
 foldercheck_(){
 printf "Directory chick...\n"
-	if [[ -d ./Globalc06 || -d ./CNc15 || -d PUc03 ]];then
+	if [[ -d ./Globalc06 || -d ./CNc15 || -d ./INc06 ]];then
 		echo "" > /dev/null
 	else
 		echo -e "\e[31mNot found folder, create folder.\e[0m"
@@ -66,9 +66,9 @@ printf "Directory chick...\n"
 		rom_download_link
 
 
-		mkdir Globalc06 && mkdir CNc15 && mkdir PUc03
+		mkdir Globalc06 && mkdir CNc15 && mkdir INc06
 		exit 1
-		fi
+	fi
 B=`ls`
 for A in $B;
 do
@@ -78,10 +78,10 @@ if [[ -d $A  && "$A" == "Globalc06" ]]; then
 elif  [[ -d $A  && "$A" == "CNc15" ]]; then
 	echo -e "\e[32m $A directory existed\e[0m"
 	imgcheck_ $A
-elif  [[ -d $A  && "$A" == "PUc03" ]]; then
+elif  [[ -d $A  && "$A" == "INc06" ]]; then
 	echo -e "\e[32m $A directory existed\e[0m"
 	imgcheck_ $A
-elif  [[ -d "$A" && "$A" == *RMX* ]]; then
+elif  [[ -d "$A" && "$A" == *RMX2121* ]]; then
 	echo -e "\e[32m $A directory existed\e[0m"
 	a=$A
 	imgcheck_ $A
@@ -97,13 +97,13 @@ done
 
 imgcheck_(){
 case $1 in
-	PUc03)
+	INc06)
 	#echo PU
-	cnimg=`ls ./PUc03 | grep "img"| wc -l`
-	cnbin=`ls ./PUc03 | grep "bin"| wc -l`
+	cnimg=`ls ./INc06 | grep "img"| wc -l`
+	cnbin=`ls ./INc06 | grep "bin"| wc -l`
 	if [[ $cnimg != 0 && $cnbin != 0 ]];then
-		if [[ -f ./PUc03/super.1.61441402.img && -f ./PUc03/tee.img ]];then
-			echo -e "\e[32m   PUc03 version found\n\e[0m"
+		if [[ -f ./INc06/super.1.61441402.img && -f ./INc06/tee.img ]];then
+			echo -e "\e[32m   INc06 version found => RMX2121_11_C.06\n\e[0m"
 			flg1=1
 		else
 			echo "Not support version,please put in correct version."
@@ -120,19 +120,19 @@ case $1 in
 	cnbin=`ls ./Globalc06 | grep "bin"| wc -l`
 	if [[ $cnimg != 0 && $cnbin != 0 ]];then
 		if [[ -f ./Globalc06/super.2.e0c313e9.img && -f ./Globalc06/tee.img ]];then
-			echo -e "\e[32m   MYC06 version found\n\e[0m"
+			echo -e "\e[32m   MYC06 version found => RMX2121_11_C.06\n\e[0m"
 			flg2=1
 		else
 				echo "Not support version,please put in correct version."
 		fi
 		if [[ -f ./Globalc06/super.2.f992f79c.img && -f ./Globalc06/tee.img ]];then
-			echo -e "\e[32m   TWC06 version found\n\e[0m"
+			echo -e "\e[32m   TWC06 version found => RMX2121TW_11_C.06\n\e[0m"
 			flg5=1
 		else
 				echo "Not support version,please put in correct version."
 		fi
 		if [[ -f ./Globalc06/super.2.4aaccf0e.img && -f ./Globalc06/tee.img ]];then
-			echo -e "\e[32m   THC06 version found\n\e[0m"
+			echo -e "\e[32m   THC06 version found => RMX2121_11_C.06\n\e[0m"
 			flg6=1
 		else
 				echo "Not support version,please put in correct version."
@@ -180,7 +180,7 @@ case $1 in
 	;;
 esac
 }
-flash_puc03(){
+flash_INc06(){
 	if [[  $connect2 -gt 0 || $connect3 -gt 0  ]];then
 		echo "Rebooting Device into Bootloader."
 		adb -s $sn reboot bootloader && sleep 20
@@ -188,43 +188,43 @@ flash_puc03(){
 	fastboot -s $sn devices
 	echo "wait 3 sec..."
 	sleep 3
-	fastboot -s $sn flash preloader ./PUc03/preloader_oppo6889.bin
-	fastboot -s $sn flash opporeserve2 ./PUc03/opporeserve2.img
-	fastboot -s $sn flash vbmeta ./PUc03/vbmeta.img
-	fastboot -s $sn flash vbmeta_system ./PUc03/vbmeta_system.img
-	fastboot -s $sn flash vbmeta_vendor ./PUc03/vbmeta_vendor.img
-	fastboot -s $sn flash special_preload ./PUc03/special_preload.img
-	fastboot -s $sn flash my_custom ./PUc03/my_custom.img
-	fastboot -s $sn flash cdt_engineering ./PUc03/cdt_engineering.img
-	fastboot -s $sn flash md1img ./PUc03/md1img.img
-	fastboot -s $sn flash spmfw ./PUc03/spmfw.img
-	fastboot -s $sn flash audio_dsp ./PUc03/audio_dsp.img
-	fastboot -s $sn flash pi_img ./PUc03/pi_img.img
-	fastboot -s $sn flash dpm_1 ./PUc03/dpm.img
-	fastboot -s $sn flash dpm_2 ./PUc03/dpm.img
-	fastboot -s $sn flash scp1 ./PUc03/scp.img
-	fastboot -s $sn flash scp2 ./PUc03/scp.img
-	fastboot -s $sn flash sspm_1 ./PUc03/sspm.img
-	fastboot -s $sn flash sspm_2 ./PUc03/sspm.img
-	fastboot -s $sn flash mcupm_1 ./PUc03/mcupm.img
-	fastboot -s $sn flash mcupm_2 ./PUc03/mcupm.img
-	fastboot -s $sn flash cam_vpu1 ./PUc03/cam_vpu1.img
-	fastboot -s $sn flash cam_vpu2 ./PUc03/cam_vpu2.img
-	fastboot -s $sn flash cam_vpu3 ./PUc03/cam_vpu3.img
-	fastboot -s $sn flash gz1 ./PUc03/gz.img
-	fastboot -s $sn flash gz2 ./PUc03/gz.img
-	fastboot -s $sn flash lk ./PUc03/lk.img
-	fastboot -s $sn flash lk2 ./PUc03/lk.img
-	fastboot -s $sn flash logo ./PUc03/logo.bin
-	fastboot -s $sn flash dtbo ./PUc03/dtbo.img
-	fastboot -s $sn flash tee1 ./PUc03/tee.img
-	fastboot -s $sn flash tee2 ./PUc03/tee.img
-	fastboot -s $sn flash super ./PUc03/super.0.d23cba54.img
-	fastboot -s $sn flash super ./PUc03/super.1.61441402.img
-	fastboot -s $sn flash super ./PUc03/super.2.362436ac.img
-	fastboot -s $sn flash boot ./PUc03/boot.img
-	fastboot -s $sn flash recovery ./PUc03/recovery.img
-	fastboot -s $sn flash userdata userdata.img
+	fastboot -s $sn flash preloader ./INc06/preloader_oppo6889.bin
+	fastboot -s $sn flash opporeserve2 ./INc06/opporeserve2.img
+	fastboot -s $sn flash vbmeta ./INc06/vbmeta.img
+	fastboot -s $sn flash vbmeta_system ./INc06/vbmeta_system.img
+	fastboot -s $sn flash vbmeta_vendor ./INc06/vbmeta_vendor.img
+	fastboot -s $sn flash special_preload ./INc06/special_preload.img
+	fastboot -s $sn flash my_custom ./INc06/my_custom.img
+	fastboot -s $sn flash cdt_engineering ./INc06/cdt_engineering.img
+	fastboot -s $sn flash md1img ./INc06/md1img.img
+	fastboot -s $sn flash spmfw ./INc06/spmfw.img
+	fastboot -s $sn flash audio_dsp ./INc06/audio_dsp.img
+	fastboot -s $sn flash pi_img ./INc06/pi_img.img
+	fastboot -s $sn flash dpm_1 ./INc06/dpm.img
+	fastboot -s $sn flash dpm_2 ./INc06/dpm.img
+	fastboot -s $sn flash scp1 ./INc06/scp.img
+	fastboot -s $sn flash scp2 ./INc06/scp.img
+	fastboot -s $sn flash sspm_1 ./INc06/sspm.img
+	fastboot -s $sn flash sspm_2 ./INc06/sspm.img
+	fastboot -s $sn flash mcupm_1 ./INc06/mcupm.img
+	fastboot -s $sn flash mcupm_2 ./INc06/mcupm.img
+	fastboot -s $sn flash cam_vpu1 ./INc06/cam_vpu1.img
+	fastboot -s $sn flash cam_vpu2 ./INc06/cam_vpu2.img
+	fastboot -s $sn flash cam_vpu3 ./INc06/cam_vpu3.img
+	fastboot -s $sn flash gz1 ./INc06/gz.img
+	fastboot -s $sn flash gz2 ./INc06/gz.img
+	fastboot -s $sn flash lk ./INc06/lk.img
+	fastboot -s $sn flash lk2 ./INc06/lk.img
+	fastboot -s $sn flash logo ./INc06/logo.bin
+	fastboot -s $sn flash dtbo ./INc06/dtbo.img
+	fastboot -s $sn flash tee1 ./INc06/tee.img
+	fastboot -s $sn flash tee2 ./INc06/tee.img
+	fastboot -s $sn flash super ./INc06/super.0.d23cba54.img
+	fastboot -s $sn flash super ./INc06/super.1.61441402.img
+	fastboot -s $sn flash super ./INc06/super.2.362436ac.img
+	fastboot -s $sn flash boot ./INc06/boot.img
+	fastboot -s $sn flash recovery ./INc06/recovery.img
+	fastboot -s $sn flash userdata ./INc06/userdata.img
 	fastboot -s $sn erase userdata
 	sleep 1
 	fastboot -s $sn reboot
@@ -324,12 +324,10 @@ flash_globalc06(){
 		fastboot -s $sn flash super ./Globalc06/super.1.48eb2998.img
 		fastboot -s $sn flash super ./Globalc06/super.2.f992f79c.img
 	elif [[ $1 == "my" ]];then
-		echo "my~"
 		fastboot -s $sn flash super ./Globalc06/super.0.4963b3cf.img
 		fastboot -s $sn flash super ./Globalc06/super.1.48eb2998.img
 		fastboot -s $sn flash super ./Globalc06/super.2.e0c313e9.img
 	else
-		echo "th~"
 		fastboot -s $sn flash super ./Globalc06/super.0.4963b3cf.img
 		fastboot -s $sn flash super ./Globalc06/super.1.48eb2998.img
 		fastboot -s $sn flash super ./Globalc06/super.2.4aaccf0e.img
@@ -344,7 +342,7 @@ flash_globalc06(){
 goflash(){
 case $1 in
 	pu)
-		flash_puc03
+		flash_INc06
 	;;
 	my | tw | th )
 		flash_globalc06 $1
@@ -800,7 +798,7 @@ mytitle(){
 echo -e "\t\t Realme X7 Pro fastboot flash Tool"
 echo
 echo -e "--------Please check usb debugging enable and fastboot unlock--------"
-echo -e "This Tool for realme android 11 after or rariants custom 11 after"
+echo -e "This Tool for realme android 11 Only or rariants custom 11 after"
 echo -e "    ----Please put rom img file under pu, tw or cn folder----"
 echo -e "\e[33mPU:Free and Open Indo-Pacific used UI2 c06 version\e[0m"
 echo -e "    https://www.realme.com/in/realme-x7-pro/specs"
@@ -1004,4 +1002,5 @@ else
 		myhelp
 		rom_download_link
 	fi
+	
 fi
