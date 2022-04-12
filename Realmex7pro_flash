@@ -11,19 +11,21 @@ rom_download_link(){
 echo ""
 echo -e "Maybe you need rom link."
 echo -e "C:android 11, F:android 12"
+
 echo -e "REF:https://realmefirmware.com/realme-x7-pro-5g-firmware/"
-echo -e "\e[36mGobal F06 ROM link(need convert tool and use fastboot flash):\e[0m"
+echo -e "\e[36mGobal F06 ROM link(need convert tool, and use fastboot flash or spf tool flash):\e[0m"
 echo -e "http://rms01.realme.net/SW/realme%20service/realme%20X7%20Pro%205G/20660/RMX2121export_11_F.06_2022032603170488.zip"
-echo -e "\e[36mIN C06 ROM link(need convert tool and use fastboot flash, this version should rollback android 12):\e[0m"
+echo -e "\e[31mCN F06 ROM link(use 3rd rec flash):\e[0m"
+echo -e "--"
+echo -e "\e[36mIN C06 ROM link(need convert tool, and use fastboot flash or spf tool flash, this version should rollback android 11 from android 12):\e[0m"
 echo -e "https://fileload.coloros.com/504342RMX2121export_11_C.06_2021121711130172.zip"
-echo -e "\e[32mGlobal C06(TW, MY, TH) ROM link(need convert tool use fastboot flash, this version should rollback android 12):\e[0m"
+echo -e "\e[32mGlobal C06(TW, MY, TH) ROM link(need convert tool, use fastboot flash, this version should rollback android 11 from android 12):\e[0m"
 echo -e "https://fileload.coloros.com/504343RMX2121export_11_C.06_2021121711100174.zip"
-echo -e "\e[33mPU C03 ROM link:\e[0m"
-echo -e "\e[33m(Need editor check function of /META-INF/com/google/android/updater-script file and use rec or spf tool flash\e[0m"
+echo -e "\e[33mPU C03 ROM link(use 3rd rec or spf tool flash):\e[0m"
 echo -e "https://phoenixnap.dl.sourceforge.net/project/sarthak-android-projects/d-ozip/RMX2121PU_11_OTA_10300270_all_J3fsF9l1Qrs3.zip"
-echo -e "\e[31mCN C23 to C25 ROM link(use 3rd rec flash)):\e[0m"
+echo -e "\e[31mCN C23 to C25 ROM link(use 3rd rec flash):\e[0m"
 echo -e "https://docs.google.com/spreadsheets/d/1dTkrGBjyXIiUYYGj27Hg5wy4GZiO-jDG7c49LTX8DCk/edit?usp=sharing"
-echo -e "\e[31mCN C15 ROM link(use fastboot flash, this version should rollback android 12):\e[0m"
+echo -e "\e[31mCN C15 ROM link(use fastboot flash, this version should rollback android 11 from android 12):\e[0m"
 echo -e "https://drive.google.com/drive/folders/1871KTAH6gYvziEfiLSlZx-Gd1b2vufta?usp=sharing"
 echo -e "\e[31mCN C08 ROM link(use 3rd rec flash):\e[0m"
 echo -e "https://otaafs-cost.coloros.com/RMX2121/RMX2121_11.C.08_10801510_202101271138/patch/CHN/RMX2121/RMX2121_11.C.08_10801510_202101271138/RMX2121_11_OTA_10801510_all_voiS7xmS7Cze_03d6cb.ozip"
@@ -58,15 +60,13 @@ echo -e "https://github.com/bkerler/oppo_ozip_decrypt"
 
 foldercheck_(){
 printf "Directory chick...\n"
-	if [[ -d ./Globalc06 || -d ./CNc15 || -d ./INc06 ]];then
+	if [[ -d ./Globalc06 || -d ./CNc15 || -d ./INc06  || -d ./Globalf06 ]] ;then
 		echo "" > /dev/null
 	else
 		echo -e "\e[31mNot found folder, create folder.\e[0m"
 		echo -e "\e[33mPlease put ROM img in specified path.\e[0m"
 		rom_download_link
-
-
-		mkdir Globalc06 && mkdir CNc15 && mkdir INc06
+		mkdir Globalc06 && mkdir CNc15 && mkdir INc06 && mkdir Globalf06
 		exit 1
 	fi
 B=`ls`
@@ -79,6 +79,9 @@ elif  [[ -d $A  && "$A" == "CNc15" ]]; then
 	echo -e "\e[32m $A directory existed\e[0m"
 	imgcheck_ $A
 elif  [[ -d $A  && "$A" == "INc06" ]]; then
+	echo -e "\e[32m $A directory existed\e[0m"
+	imgcheck_ $A
+elif  [[ -d $A  && "$A" == "Globalf06" ]]; then
 	echo -e "\e[32m $A directory existed\e[0m"
 	imgcheck_ $A
 elif  [[ -d "$A" && "$A" == *RMX2121* ]]; then
@@ -115,7 +118,6 @@ case $1 in
 	cnbin=0
 	;;
 	Globalc06)
-	#echo TW
 	cnimg=`ls ./Globalc06 | grep "img"| wc -l`
 	cnbin=`ls ./Globalc06 | grep "bin"| wc -l`
 	if [[ $cnimg != 0 && $cnbin != 0 ]];then
@@ -133,6 +135,35 @@ case $1 in
 		fi
 		if [[ -f ./Globalc06/super.2.4aaccf0e.img && -f ./Globalc06/tee.img ]];then
 			echo -e "\e[32m   THC06 version found => RMX2121_11_C.06\n\e[0m"
+			flg6=1
+		else
+				echo "Not support version,please put in correct version."
+		fi		
+	else
+		echo -e "\e[31m＝＝＞ Not found rom img.\n\e[0m"
+	fi
+	
+	cnimg=0
+	cnbin=0
+	;;
+	Globalf06)
+	cnimg=`ls ./Globalf06 | grep "img"| wc -l`
+	cnbin=`ls ./Globalf06 | grep "bin"| wc -l`
+	if [[ $cnimg != 0 && $cnbin != 0 ]];then
+		if [[ -f ./Globalf06/super.2.830d80bc.img && -f ./Globalf06/recovery.img ]];then
+			echo -e "\e[32m   MYF06 version found => RMX2121_11_F.06\n\e[0m"
+			flg2=1
+		else
+				echo "Not support version,please put in correct version."
+		fi
+		if [[ -f ./Globalf06/super.2.fb1427fb.img && -f ./Globalf06/recovery.img ]];then
+			echo -e "\e[32m   TWF06 version found => RMX2121TW_11_F.06\n\e[0m"
+			flg5=1
+		else
+				echo "Not support version,please put in correct version."
+		fi
+		if [[ -f ./Globalf06/super.2.354eb5b2.img && -f ./Globalf06/recovery.img ]];then
+			echo -e "\e[32m   THF06 version found => RMX2121_11_F.06\n\e[0m"
 			flg6=1
 		else
 				echo "Not support version,please put in correct version."
@@ -182,6 +213,7 @@ esac
 }
 flash_INc06(){
 	if [[  $connect2 -gt 0 || $connect3 -gt 0  ]];then
+		echo -e "\e[36mIN - Android 11\e[0m"
 		echo "Rebooting Device into Bootloader."
 		adb -s $sn reboot bootloader && sleep 20
 	fi
@@ -232,6 +264,7 @@ flash_INc06(){
 
 flash_cnc15(){
 	if [[  $connect2 -gt 0 || $connect3 -gt 0  ]];then
+		echo -e "\e[36mCN - Android 11\e[0m"
 		echo "Rebooting Device into Bootloader."
 		adb -s $sn reboot bootloader && sleep 20
 	fi
@@ -274,14 +307,15 @@ flash_cnc15(){
 	fastboot -s $sn flash super ./CNc15/super.2.ce0fab33.img
 	fastboot -s $sn flash boot ./CNc15/boot.img
 	fastboot -s $sn flash recovery ./CNc15/recovery.img
-	fastboot -s $sn flash userdata ./CNc15/userdata.img
+	#fastboot -s $sn flash userdata ./CNc15/userdata.img
 	fastboot -s $sn erase userdata
 	sleep 1
 	fastboot -s $sn reboot
 }
 
-flash_globalc06(){
+flash_globalC06(){
 	if [[  $connect2 -gt 0 || $connect3 -gt 0  ]];then
+		echo -e "\e[36m$choise - Android 11\e[0m"
 		echo "Rebooting Device into Bootloader."
 		adb -s $sn reboot bootloader && sleep 20
 	fi
@@ -334,18 +368,103 @@ flash_globalc06(){
 	fi
 	fastboot -s $sn flash boot ./Globalc06/boot.img
 	fastboot -s $sn flash recovery ./Globalc06/recovery.img
-	fastboot -s $sn flash userdata ./Globalc06/userdata.img
+	#fastboot -s $sn flash userdata ./Globalc06/userdata.img
 	fastboot -s $sn erase userdata
 	sleep 1
 	fastboot -s $sn reboot
 }
+
+flash_GlobalF06(){
+	if [[  $connect2 -gt 0 || $connect3 -gt 0  ]];then
+		echo -e "\e[36m$choise - Android 12\e[0m"
+		echo "Rebooting Device into Bootloader."
+		adb -s $sn reboot bootloader && sleep 20
+	fi
+	fastboot -s $sn devices
+	echo "wait 3 sec..."
+	sleep 3	
+	fastboot -s $sn flash preloader ./Globalf06/preloader_k6889v1_64.bin
+	fastboot -s $sn flash opporeserve2 ./Globalf06/opporeserve2.img
+	fastboot -s $sn flash vbmeta ./Globalf06/vbmeta.img
+	fastboot -s $sn flash vbmeta_system ./Globalf06/vbmeta_system.img
+	fastboot -s $sn flash vbmeta_vendor ./Globalf06/vbmeta_vendor.img
+	fastboot -s $sn flash special_preload ./Globalf06/special_preload.img
+	fastboot -s $sn flash my_custom ./Globalf06/my_custom.img
+	fastboot -s $sn flash cdt_engineering ./Globalf06/cdt_engineering.img
+	fastboot -s $sn flash md1img ./Globalf06/md1img.img
+	fastboot -s $sn flash spmfw ./Globalf06/spmfw.img
+	fastboot -s $sn flash audio_dsp ./Globalf06/audio_dsp.img
+	fastboot -s $sn flash pi_img ./Globalf06/pi_img.img
+	fastboot -s $sn flash dpm_1 ./Globalf06/dpm.img
+	fastboot -s $sn flash dpm_2 ./Globalf06/dpm.img
+	fastboot -s $sn flash scp1 ./Globalf06/scp.img
+	fastboot -s $sn flash scp2 ./Globalf06/scp.img
+	fastboot -s $sn flash sspm_1 ./Globalf06/sspm.img
+	fastboot -s $sn flash sspm_2 ./Globalf06/sspm.img
+	fastboot -s $sn flash mcupm_1 ./Globalf06/mcupm.img
+	fastboot -s $sn flash mcupm_2 ./Globalf06/mcupm.img
+	fastboot -s $sn flash cam_vpu1 ./Globalf06/cam_vpu1.img
+	fastboot -s $sn flash cam_vpu2 ./Globalf06/cam_vpu2.img
+	fastboot -s $sn flash cam_vpu3 ./Globalf06/cam_vpu3.img
+	fastboot -s $sn flash gz1 ./Globalf06/gz.img
+	fastboot -s $sn flash gz2 ./Globalf06/gz.img
+	fastboot -s $sn flash lk ./Globalf06/lk.img
+	fastboot -s $sn flash lk2 ./Globalf06/lk.img
+	fastboot -s $sn flash logo ./Globalf06/logo.bin
+	fastboot -s $sn flash dtbo ./Globalf06/dtbo.img
+	fastboot -s $sn flash tee1 ./Globalf06/tee.img
+	fastboot -s $sn flash tee2 ./Globalf06/tee.img
+	fastboot -s $sn flash super ./Globalf06/super.0.827ba8f0.img
+	fastboot -s $sn flash super ./Globalf06/super.1.c11b2247.img
+	if [[ $1 == "tw" ]];then
+		fastboot -s $sn flash super ./Globalf06/super.2.fb1427fb.img
+	elif [[ $1 == "my" ]];then
+		fastboot -s $sn flash super ./Globalf06/super.2.830d80bc.img
+	else
+		fastboot -s $sn flash super ./Globalf06/super.2.354eb5b2.img
+	fi
+	fastboot -s $sn flash boot ./Globalf06/boot.img
+	fastboot -s $sn flash recovery ./Globalf06/recovery.img
+	#fastboot -s $sn flash userdata ./Globalf06/userdata.img
+	fastboot -s $sn erase userdata
+	sleep 1
+	fastboot -s $sn reboot
+}
+
 goflash(){
 case $1 in
 	pu)
 		flash_INc06
 	;;
 	my | tw | th )
-		flash_globalc06 $1
+		if [[ -d ./Globalc06 || -d ./Globalf06 ]];then
+		while [[ true ]]
+		do
+			read -p "target_OS(11 or 12, q is exit):" target_OS
+			if [[ $target_OS == q || $target_OS == Q ]];then
+				echo -e "\e[33mExit.\e[0m"
+				break
+			fi
+			if [[ $target_OS == "11" ]];then
+				flash_globalC06 $choise
+				break
+			elif [[ $target_OS == "12" ]];then
+				flash_GlobalF06 $choise
+				break			
+			else
+				echo -e "\e[31mInput error.\n\e[0m"
+			fi
+			target_OS=""
+		done
+		elif [[ -d ./Globalc06 ]];then
+			flash_globalC06 $choise
+		elif [[ -d ./Globalf06 ]];then
+			flash_GlobalF06 $choise
+		else
+			echo -e "\e[31mInput error.\n\e[0m"
+		fi
+		choise=""
+		
 	;;
 	cn)
 		flash_cnc15
