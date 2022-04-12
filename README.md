@@ -1,5 +1,5 @@
 # Realme_x7pro_flash
-> 這是一個可以將已經解鎖android 11 手機的轉換成成其他國家版本,也可以將目前的系統版產生供給fastboot 使用的刷機包
+> 這是一個可以將已經解鎖android 11 以上的手機轉換成成其他國家使用的版本,也可以將目前的系統版產生供給fastboot 使用的刷機包
 -  目前支援的版本
 - CN C15
 - Global C06:TW, MY, TH
