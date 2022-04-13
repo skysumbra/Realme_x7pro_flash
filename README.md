@@ -5,6 +5,8 @@
 - Global C06:TW, MY, TH
 - Global F06:TW, MY, TH
 
+## 如何執行
+在linux 環境下用sh 執行
 ## 程式截圖
 ![](https://i.ibb.co/B466wkN/demo.png)
 ### 參考項目
