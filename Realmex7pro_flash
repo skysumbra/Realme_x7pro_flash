@@ -19,6 +19,8 @@ echo -e "\e[31mCN F06 ROM link(use 3rd rec flash):\e[0m"
 echo -e "--"
 echo -e "\e[36mIN C06 ROM link(need convert tool, and use fastboot flash or spf tool flash, this version should rollback android 11 from android 12):\e[0m"
 echo -e "https://fileload.coloros.com/504342RMX2121export_11_C.06_2021121711130172.zip"
+echo -e "\e[32mGlobal C08(TW, MY, TH, IN) ROM link(need convert tool, use fastboot flash, this version should rollback android 11 from android 12):\e[0m"
+echo -e "https://rms01.realme.net/SW/realme%20service/realme%20X7%20Pro%205G/20660/RMX2121export_11_C.08_2022032315430127.zip"
 echo -e "\e[32mGlobal C06(TW, MY, TH) ROM link(need convert tool, use fastboot flash, this version should rollback android 11 from android 12):\e[0m"
 echo -e "https://fileload.coloros.com/504343RMX2121export_11_C.06_2021121711100174.zip"
 echo -e "\e[33mPU C03 ROM link(use 3rd rec or spf tool flash):\e[0m"
@@ -60,7 +62,7 @@ echo -e "https://github.com/bkerler/oppo_ozip_decrypt"
 
 foldercheck_(){
 printf "Directory chick...\n"
-	if [[ -d ./Globalc06 || -d ./CNc15 || -d ./INc06  || -d ./Globalf06 ]] ;then
+	if [[ -d ./Globalc06 || -d ./Globalc08 || -d ./CNc15 || -d ./INc06  || -d ./Globalf06 ]] ;then
 		echo "" > /dev/null
 	else
 		echo -e "\e[31mNot found folder, create folder.\e[0m"
@@ -120,7 +122,7 @@ case $1 in
 	Globalc06)
 	cnimg=`ls ./Globalc06 | grep "img"| wc -l`
 	cnbin=`ls ./Globalc06 | grep "bin"| wc -l`
-	if [[ $cnimg != 0 && $cnbin != 0 ]];then
+	if [[ $cnimg != 0 && $cnbin != 0 ]];then	
 		if [[ -f ./Globalc06/super.2.e0c313e9.img && -f ./Globalc06/tee.img ]];then
 			echo -e "\e[32m   MYC06 version found => RMX2121_11_C.06\n\e[0m"
 			flg2=1
@@ -146,6 +148,37 @@ case $1 in
 	cnimg=0
 	cnbin=0
 	;;
+	
+	Globalc08)
+	cnimg=`ls ./Globalc08 | grep "img"| wc -l`
+	cnbin=`ls ./Globalc08 | grep "bin"| wc -l`
+	if [[ $cnimg != 0 && $cnbin != 0 ]];then
+		if [[ -f ./Globalc08/super.1.799cf88b.img && -f ./Globalc08/super.2.4700fbac.img ]];then
+			echo -e "\e[32m   MYC08 version found => RMX2121_11_C.08\n\e[0m"
+			flg2=1
+		else
+			echo "Not support version,please put in correct version."
+		fi
+		if [[ -f ./Globalc08/super.1.799cf88b.img && -f ./Globalc08/super.2.10b6feeb.img ]];then
+			echo -e "\e[32m   TWC08 version found => RMX2121TW_11_C.08\n\e[0m"
+			flg5=1
+		else
+				echo "Not support version,please put in correct version."
+		fi
+		if [[ -f ./Globalc08/super.1.799cf88b.img && -f ./Globalc08/super.2.aa6bced4.img ]];then
+			echo -e "\e[32m   THC08 version found => RMX2121_11_C.08\n\e[0m"
+			flg6=1
+		else
+			echo "Not support version,please put in correct version."
+		fi		
+	else
+		echo -e "\e[31m＝＝＞ Not found rom img.\n\e[0m"
+	fi
+	
+	cnimg=0
+	cnbin=0
+	;;
+	
 	Globalf06)
 	cnimg=`ls ./Globalf06 | grep "img"| wc -l`
 	cnbin=`ls ./Globalf06 | grep "bin"| wc -l`
@@ -368,7 +401,66 @@ flash_globalC06(){
 	fi
 	fastboot -s $sn flash boot ./Globalc06/boot.img
 	fastboot -s $sn flash recovery ./Globalc06/recovery.img
-	#fastboot -s $sn flash userdata ./Globalc06/userdata.img
+	fastboot -s $sn erase userdata
+	sleep 1
+	fastboot -s $sn reboot
+}
+
+flash_Globalc08(){
+	if [[  $connect2 -gt 0 || $connect3 -gt 0  ]];then
+		echo -e "\e[36m$choise - Android 11\e[0m"
+		echo "Rebooting Device into Bootloader."
+		adb -s $sn reboot bootloader && sleep 20
+	fi
+	fastboot -s $sn devices
+	echo "wait 3 sec..."
+	sleep 3
+	fastboot -s $sn flash preloader ./Globalc08/preloader_oppo6889.bin
+	fastboot -s $sn flash opporeserve2 ./Globalc08/opporeserve2.img
+	fastboot -s $sn flash vbmeta ./Globalc08/vbmeta.img
+	fastboot -s $sn flash vbmeta_system ./Globalc08/vbmeta_system.img
+	fastboot -s $sn flash vbmeta_vendor ./Globalc08/vbmeta_vendor.img
+	fastboot -s $sn flash special_preload ./Globalc08/special_preload.img
+	fastboot -s $sn flash my_custom ./Globalc08/my_custom.img
+	fastboot -s $sn flash cdt_engineering ./Globalc08/cdt_engineering.img
+	fastboot -s $sn flash md1img ./Globalc08/md1img.img
+	fastboot -s $sn flash spmfw ./Globalc08/spmfw.img
+	fastboot -s $sn flash audio_dsp ./Globalc08/audio_dsp.img
+	fastboot -s $sn flash pi_img ./Globalc08/pi_img.img
+	fastboot -s $sn flash dpm_1 ./Globalc08/dpm.img
+	fastboot -s $sn flash dpm_2 ./Globalc08/dpm.img
+	fastboot -s $sn flash scp1 ./Globalc08/scp.img
+	fastboot -s $sn flash scp2 ./Globalc08/scp.img
+	fastboot -s $sn flash sspm_1 ./Globalc08/sspm.img
+	fastboot -s $sn flash sspm_2 ./Globalc08/sspm.img
+	fastboot -s $sn flash mcupm_1 ./Globalc08/mcupm.img
+	fastboot -s $sn flash mcupm_2 ./Globalc08/mcupm.img
+	fastboot -s $sn flash cam_vpu1 ./Globalc08/cam_vpu1.img
+	fastboot -s $sn flash cam_vpu2 ./Globalc08/cam_vpu2.img
+	fastboot -s $sn flash cam_vpu3 ./Globalc08/cam_vpu3.img
+	fastboot -s $sn flash gz1 ./Globalc08/gz.img
+	fastboot -s $sn flash gz2 ./Globalc08/gz.img
+	fastboot -s $sn flash lk ./Globalc08/lk.img
+	fastboot -s $sn flash lk2 ./Globalc08/lk.img
+	fastboot -s $sn flash logo ./Globalc08/logo.bin
+	fastboot -s $sn flash dtbo ./Globalc08/dtbo.img
+	fastboot -s $sn flash tee1 ./Globalc08/tee.img
+	fastboot -s $sn flash tee2 ./Globalc08/tee.img
+	if [[ $1 == "tw" ]];then
+		fastboot -s $sn flash super ./Globalc08/super.0.bbd673b2.img
+		fastboot -s $sn flash super ./Globalc08/super.1.799cf88b.img
+		fastboot -s $sn flash super ./Globalc08/super.2.10b6feeb.img
+	elif [[ $1 == "my" ]];then
+		fastboot -s $sn flash super ./Globalc08/super.0.bbd673b2.img
+		fastboot -s $sn flash super ./Globalc08/super.1.799cf88b.img
+		fastboot -s $sn flash super ./Globalc08/super.2.4700fbac.img
+	else
+		fastboot -s $sn flash super ./Globalc08/super.0.bbd673b2.img
+		fastboot -s $sn flash super ./Globalc08/super.1.799cf88b.img
+		fastboot -s $sn flash super ./Globalc08/super.2.aa6bced4.img
+	fi
+	fastboot -s $sn flash boot ./Globalc08/boot.img
+	fastboot -s $sn flash recovery ./Globalc08/recovery.img
 	fastboot -s $sn erase userdata
 	sleep 1
 	fastboot -s $sn reboot
@@ -438,28 +530,44 @@ case $1 in
 	;;
 	my | tw | th )
 		if [[ -d ./Globalc06 || -d ./Globalf06 ]];then
-		while [[ true ]]
-		do
-			read -p "target_OS(11 or 12, q is exit):" target_OS
-			if [[ $target_OS == q || $target_OS == Q ]];then
-				echo -e "\e[33mExit.\e[0m"
-				break
-			fi
-			if [[ $target_OS == "11" ]];then
-				flash_globalC06 $choise
-				break
-			elif [[ $target_OS == "12" ]];then
-				flash_GlobalF06 $choise
-				break			
-			else
-				echo -e "\e[31mInput error.\n\e[0m"
-			fi
-			target_OS=""
-		done
-		elif [[ -d ./Globalc06 ]];then
-			flash_globalC06 $choise
-		elif [[ -d ./Globalf06 ]];then
-			flash_GlobalF06 $choise
+			while [[ true ]]
+			do
+				read -p "Target OS(11 or 12, q is exit):" target_OS
+				if [[ $target_OS == q || $target_OS == Q ]];then
+					echo -e "\e[33mExit.\e[0m"
+					break
+				fi
+				if [[ $target_OS == "11" ]];then
+					flash_globalC06 $choise
+					break
+				elif [[ $target_OS == "12" ]];then
+					flash_GlobalF06 $choise
+					break			
+				else
+					echo -e "\e[31mInput error.\n\e[0m"
+				fi
+				target_OS=""
+			done
+		elif [[ -d ./Globalc08 || -d ./Globalc06 ]];then
+			while [[ true ]]
+			do
+				read -p "Realme UI2 version(06 or 08, q is exit):" target_OS
+				if [[ $target_OS == q || $target_OS == Q ]];then
+					echo -e "\e[33mExit.\e[0m"
+					break
+				fi
+				if [[ $target_OS == "06" ]];then
+					flash_globalC06 $choise
+					break
+				elif [[ $target_OS == "08" ]];then
+					flash_globalC08 $choise
+					break			
+				else
+					echo -e "\e[31mInput error.\n\e[0m"
+				fi
+				target_OS=""
+			done		
+
 		else
 			echo -e "\e[31mInput error.\n\e[0m"
 		fi
