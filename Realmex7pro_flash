@@ -1,4 +1,6 @@
 #!/bin/sh
+DIR="/storage/emulated/0"
+platform=""
 flg4="0"
 flg3="0"
 flg2="0"
@@ -19,7 +21,7 @@ echo -e "\e[31mCN F06 ROM link(use 3rd rec flash):\e[0m"
 echo -e "--"
 echo -e "\e[36mIN C06 ROM link(need convert tool, and use fastboot flash or spf tool flash, this version should rollback android 11 from android 12):\e[0m"
 echo -e "https://fileload.coloros.com/504342RMX2121export_11_C.06_2021121711130172.zip"
-echo -e "\e[32mGlobal C08(TW, MY, TH) ROM link(need convert tool, use fastboot flash, this version should rollback android 11 from android 12):\e[0m"
+echo -e "\e[32mGlobal C08(TW, MY, TH, IN) ROM link(need convert tool, use fastboot flash, this version should rollback android 11 from android 12):\e[0m"
 echo -e "https://rms01.realme.net/SW/realme%20service/realme%20X7%20Pro%205G/20660/RMX2121export_11_C.08_2022032315430127.zip"
 echo -e "\e[32mGlobal C06(TW, MY, TH) ROM link(need convert tool, use fastboot flash, this version should rollback android 11 from android 12):\e[0m"
 echo -e "https://fileload.coloros.com/504343RMX2121export_11_C.06_2021121711100174.zip"
@@ -518,7 +520,7 @@ flash_GlobalF06(){
 	fastboot -s $sn flash boot ./Globalf06/boot.img
 	fastboot -s $sn flash recovery ./Globalf06/recovery.img
 	#fastboot -s $sn flash userdata ./Globalf06/userdata.img
-	fastboot -s $sn erase userdata
+	#fastboot -s $sn erase userdata
 	sleep 1
 	fastboot -s $sn reboot
 }
@@ -695,7 +697,7 @@ fi
 }
 
 backup_all_img(){
-Mybackup_folder="${product_UIversion}_backup_img"
+Mybackup_folder="$DIR/${product_UIversion}_backup_all_img"
 if [[ -d ./$Mybackup_folder ]]; then
 	echo -e "\e[32m $Mybackup_folder directory existed.\e[0m"
 	echo "Userdata partitions not backup."
@@ -706,33 +708,59 @@ else
 fi
 echo "wait..."
 sleep 2
-total=`adb -s $sn shell ls /dev/block/by-name/ | wc -l`
-echo "Total $total partitions"
-i=$(adb -s $sn shell ls /dev/block/by-name/)
-c=1
-for i in $i
-do
-	echo "$c. $i found"
-	sleep 1
-	if [[ $i = userdata || $i = sda || $i = sdb || $i = sdc || $i = sdd || $i = sde || $i = sdf ]]; then
-		echo " ===> skip"
-		c=$(($c+1))		
-	else
-		adb -s $sn shell "su -c 'dd if=/dev/block/by-name/$i of=/sdcard/$i.img'" > /dev/null
-		adb -s $sn pull /sdcard/$i.img ./$Mybackup_folder > /dev/null
-		#echo "adb -s $sn shell dd if=/dev/block/by-name/$i of=$Mybackup_folder/$i.img"
-		echo -e "\e[32mcompleted\e[0m"
-		c=$(($c+1))
+if [[ $platform == "x86_64" ]];then
+	total=`adb -s $sn shell ls /dev/block/by-name/ | wc -l`
+	echo "Total $total partitions"
+	i=$(adb -s $sn shell ls /dev/block/by-name/)
+	c=1
+	for i in $i
+	do
+		echo "$c. $i found"
 		sleep 1
-		adb -s $sn shell rm /sdcard/$i.img
-	fi
-	i=""
-done
+		if [[ $i = userdata || $i = sda || $i = sdb || $i = sdc || $i = sdd || $i = sde || $i = sdf ]]; then
+			echo " ===> skip"
+			c=$(($c+1))		
+		else
+			adb -s $sn shell "su -c 'dd if=/dev/block/by-name/$i of=/sdcard/$i.img'" > /dev/null
+			adb -s $sn pull /sdcard/$i.img ./$Mybackup_folder > /dev/null
+			#echo "adb -s $sn shell dd if=/dev/block/by-name/$i of=$Mybackup_folder/$i.img"
+			echo -e "\e[32mcompleted\e[0m"
+			c=$(($c+1))
+			sleep 1
+			adb -s $sn shell rm /sdcard/$i.img
+		fi
+		i=""
+	done
 
-size=`du -h ./$Mybackup_folder | awk '{print $1}'`
-echo "Files saved in $Mybackup_folder folder, size:$size"
-echo -e  "\e[32mDone\e[0m"
+	size=`du -h ./$Mybackup_folder | awk '{print $1}'`
+	echo "Files saved in $Mybackup_folder folder, size:$size"
+	echo -e  "\e[32mDone\e[0m"
+else
+	total=`ls /dev/block/by-name/ | wc -l`
+	echo "Total $total partitions"
+	i=$(ls /dev/block/by-name/)
+	c=1
+	for i in $i
+	do
+		echo "$c. $i found"
+		sleep 1
+		if [[ $i = userdata || $i = sda || $i = sdb || $i = sdc || $i = sdd || $i = sde || $i = sdf ]]; then
+			echo " ===> skip"
+			c=$(($c+1))		
+		else
+			dd if=/dev/block/by-name/$i of=./$Mybackup_folder/$i.img > /dev/null
+			echo -e "\e[32mcompleted\e[0m"
+			c=$(($c+1))
+			sleep 1
+		fi
+		i=""
+	done
 
+	size=`du -h ./$Mybackup_folder | awk '{print $1}'`
+	echo "Files saved in $Mybackup_folder folder, size:$size"
+	echo -e  "\e[32mDone\e[0m"
+
+fi
 }
 
 backup_boot_recovery_vbmeta(){
@@ -767,111 +795,182 @@ fi
 }
 
 clone_image(){
-Mybackup_folder="$product_UIversion"
+Mybackup_folder="$DIR/$product_UIversion"
 if [[ -d ./$Mybackup_folder ]]; then
 	echo -e "\e[32m$Mybackup_folder directory existed\e[0m"
 else
 	echo -e "\e[31mNot found folder, create folder.\e[0m"
+	echo $Mybackup_folder
 	mkdir $Mybackup_folder
-	echo -e "\e[32$product_UIversion folder created.\e[0m"
-	
+	echo -e "\e[32m$product_UIversion \e[0mfolder created."
 fi
-total=`adb -s $sn shell ls /dev/block/by-name/ | wc -l`
-echo "Total $total partitions."
-echo "Collect the necessary partitions..."
-iii=$(adb -s $sn shell ls /dev/block/by-name/)
-c=1
-for i in $iii
-do	
-	if [[ $i = audio_dsp || $i = boot || $i = cam_vpu1 || \
-	$i = cam_vpu2 || $i = cam_vpu3 || $i = cdt_engineering || \
-	$i = dpm_1 || $i = dtbo || $i = gz1 || \
-	$i = lk || $i = logo || $i = mcupm_1 || \
-	$i = md1img || $i = my_custom || $i = opporeserve2 || \
-	$i = pi_img || $i = preloader_a || $i = recovery || \
-	$i = scp1 || $i = special_preload || $i = spmfw || \
-	$i = sspm_1 || $i = super || $i = tee1 || \
-	$i = vbmeta || $i = vbmeta_system || $i = vbmeta_vendor ]]; then
-		echo "$c. $i found"
-		sleep 1
-		ii=""
-		if [[ $i = dpm_1 ]]; then
-			ii=`echo $i |sed 's/dpm_1/dpm/g'`
-			echo "rename and saved $ii"
-			adb -s $sn shell "su -c 'dd if=/dev/block/by-name/$i of=/sdcard/$ii.img'" 2> /dev/null
-			adb -s $sn pull /sdcard/$ii.img ./$Mybackup_folder > /dev/null
-			adb -s $sn shell rm /sdcard/$ii.img
-			#du -sh ./$Mybackup_folder | awk '{print $1}'
-		elif [[ $i = preloader_a ]]; then
-			ii=`echo $i |sed 's/preloader_a/preloader/g'`
-			echo "rename and saved $ii"
-			adb -s $sn shell "su -c 'dd if=/dev/block/by-name/$i of=/sdcard/preloader_oppo6889.bin'" 2> /dev/null
-			adb -s $sn pull /sdcard/$preloader_oppo6889.bin ./$Mybackup_folder > /dev/null
-			adb -s $sn shell rm /sdcard/preloader_oppo6889.bin
-		elif [[ $i = gz1 ]]; then
-			ii=`echo $i |sed 's/gz1/gz/g'`
-			echo "rename and saved $ii"
-			adb -s $sn shell "su -c 'dd if=/dev/block/by-name/$i of=/sdcard/$ii.img'" 2> /dev/null
-			adb -s $sn pull /sdcard/$ii.img ./$Mybackup_folder > /dev/null
-			adb -s $sn shell rm /sdcard/$ii.img
-			#du -sh ./$Mybackup_folder/$ii.img | awk '{print $1}'
-		elif [[ $i = mcupm_1 ]]; then
-			ii=`echo $i |sed 's/mcupm_1/mcupm/g'`
-			echo "rename and saved $ii"
-			adb -s $sn shell "su -c 'dd if=/dev/block/by-name/$i of=/sdcard/$ii.img'" 2> /dev/null
-			adb -s $sn pull /sdcard/$ii.img ./$Mybackup_folder > /dev/null
-			adb -s $sn shell rm /sdcard/$ii.img
-			#du -sh ./$Mybackup_folder/$ii.img | awk '{print $1}'
-		elif [[ $i = scp1 ]]; then
-			ii=`echo $i |sed 's/scp1/scp/g'`
-			echo "rename and saved $ii"
-			adb -s $sn shell "su -c 'dd if=/dev/block/by-name/$i of=/sdcard/$ii.img'" 2> /dev/null
-			adb -s $sn pull /sdcard/$ii.img ./$Mybackup_folder > /dev/null
-			adb -s $sn shell rm /sdcard/$ii.img
-			#du -sh ./$Mybackup_folder/$ii.img | awk '{print $1}'
-		elif [[ $i = sspm_1 ]]; then
-			ii=`echo $i |sed 's/sspm_1/sspm/g'`
-			echo "rename and saved $ii"
-			adb -s $sn shell "su -c 'dd if=/dev/block/by-name/$i of=/sdcard/$ii.img'" 2> /dev/null
-			adb -s $sn pull /sdcard/$ii.img ./$Mybackup_folder > /dev/null
-			adb -s $sn shell rm /sdcard/$ii.img
-			#du -sh ./$Mybackup_folder/$ii.img | awk '{print $1}'
-		elif [[ $i = tee1 ]]; then
-			ii=`echo $i |sed 's/tee1/tee/g'`
-			echo "rename and saved $ii"
-			adb -s $sn shell "su -c 'dd if=/dev/block/by-name/$i of=/sdcard/$ii.img'" 2> /dev/null
-			adb -s $sn pull /sdcard/$ii.img ./$Mybackup_folder > /dev/null
-			adb -s $sn shell rm /sdcard/$ii.img
-			#du -sh ./$Mybackup_folder/$ii.img | awk '{print $1}'
-		elif [[ $i = super ]]; then
-			echo "The img is bigger, wait..."
-			adb -s $sn shell dd "su -c 'if=/dev/block/by-name/$i of=/sdcard/$i.img'" 2> /dev/null
-			adb -s $sn pull /sdcard/$i.img ./$Mybackup_folder > /dev/null
-			adb -s $sn shell rm /sdcard/$i.img
-		elif [[ $i = logo ]]; then
-			adb -s $sn shell "su -c 'dd if=/dev/block/by-name/$i of=/sdcard/$i.bin'" 2> /dev/null
-			adb -s $sn pull /sdcard/$i.bin ./$Mybackup_folder > /dev/null
-			adb -s $sn shell rm /sdcard/$i.bin	
-		else
-			adb -s $sn shell "su -c 'dd if=/dev/block/by-name/$i of=/sdcard/$i.img'" 2> /dev/null
-			adb -s $sn pull /sdcard/$i.img ./$Mybackup_folder > /dev/null
-			adb -s $sn shell rm /sdcard/$i.img
-			#echo "$i"
-		fi
-		echo -e "\e[32mcompleted\e[0m"
-		c=$(($c+1))
-		
-		
-	else
-		echo " ===> skip" >/dev/null
-		
-	fi
-	sleep 1
-done
-size=`du -h ./$Mybackup_folder | awk '{print $1}'`
-echo "Files saved in $Mybackup_folder folder, size:$size"
-echo -e  "\e[32mDone\e[0m"
 
+if [[ $platform == "x86_64" ]];then
+	total=`adb -s $sn shell ls /dev/block/by-name/ | wc -l`
+	echo "Total $total partitions."
+	echo "Collect the necessary partitions..."
+	iii=$(adb -s $sn shell ls /dev/block/by-name/)
+	c=1
+	for i in $iii
+	do	
+		if [[ $i = audio_dsp || $i = boot || $i = cam_vpu1 || \
+		$i = cam_vpu2 || $i = cam_vpu3 || $i = cdt_engineering || \
+		$i = dpm_1 || $i = dtbo || $i = gz1 || \
+		$i = lk || $i = logo || $i = mcupm_1 || \
+		$i = md1img || $i = my_custom || $i = opporeserve2 || \
+		$i = pi_img || $i = preloader_a || $i = recovery || \
+		$i = scp1 || $i = special_preload || $i = spmfw || \
+		$i = sspm_1 || $i = super || $i = tee1 || \
+		$i = vbmeta || $i = vbmeta_system || $i = vbmeta_vendor ]]; then
+			echo "$c. $i found"
+			sleep 1
+			ii=""
+			if [[ $i = dpm_1 ]]; then
+				ii=`echo $i |sed 's/dpm_1/dpm/g'`
+				echo "Rename and saved $ii"
+				adb -s $sn shell "su -c 'dd if=/dev/block/by-name/$i of=/sdcard/$ii.img'" 2> /dev/null
+				adb -s $sn pull /sdcard/$ii.img ./$Mybackup_folder > /dev/null
+				adb -s $sn shell rm /sdcard/$ii.img
+				#du -sh ./$Mybackup_folder | awk '{print $1}'
+			elif [[ $i = preloader_a ]]; then
+				ii=`echo $i |sed 's/preloader_a/preloader/g'`
+				echo "Rename and saved $ii"
+				adb -s $sn shell "su -c 'dd if=/dev/block/by-name/$i of=/sdcard/preloader_oppo6889.bin'" 2> /dev/null
+				adb -s $sn pull /sdcard/$preloader_oppo6889.bin ./$Mybackup_folder > /dev/null
+				adb -s $sn shell rm /sdcard/preloader_oppo6889.bin
+			elif [[ $i = gz1 ]]; then
+				ii=`echo $i |sed 's/gz1/gz/g'`
+				echo "Rename and saved $ii"
+				adb -s $sn shell "su -c 'dd if=/dev/block/by-name/$i of=/sdcard/$ii.img'" 2> /dev/null
+				adb -s $sn pull /sdcard/$ii.img ./$Mybackup_folder > /dev/null
+				adb -s $sn shell rm /sdcard/$ii.img
+				#du -sh ./$Mybackup_folder/$ii.img | awk '{print $1}'
+			elif [[ $i = mcupm_1 ]]; then
+				ii=`echo $i |sed 's/mcupm_1/mcupm/g'`
+				echo "Rename and saved $ii"
+				adb -s $sn shell "su -c 'dd if=/dev/block/by-name/$i of=/sdcard/$ii.img'" 2> /dev/null
+				adb -s $sn pull /sdcard/$ii.img ./$Mybackup_folder > /dev/null
+				adb -s $sn shell rm /sdcard/$ii.img
+				#du -sh ./$Mybackup_folder/$ii.img | awk '{print $1}'
+			elif [[ $i = scp1 ]]; then
+				ii=`echo $i |sed 's/scp1/scp/g'`
+				echo "Rename and saved $ii"
+				adb -s $sn shell "su -c 'dd if=/dev/block/by-name/$i of=/sdcard/$ii.img'" 2> /dev/null
+				adb -s $sn pull /sdcard/$ii.img ./$Mybackup_folder > /dev/null
+				adb -s $sn shell rm /sdcard/$ii.img
+				#du -sh ./$Mybackup_folder/$ii.img | awk '{print $1}'
+			elif [[ $i = sspm_1 ]]; then
+				ii=`echo $i |sed 's/sspm_1/sspm/g'`
+				echo "Rename and saved $ii"
+				adb -s $sn shell "su -c 'dd if=/dev/block/by-name/$i of=/sdcard/$ii.img'" 2> /dev/null
+				adb -s $sn pull /sdcard/$ii.img ./$Mybackup_folder > /dev/null
+				adb -s $sn shell rm /sdcard/$ii.img
+				#du -sh ./$Mybackup_folder/$ii.img | awk '{print $1}'
+			elif [[ $i = tee1 ]]; then
+				ii=`echo $i |sed 's/tee1/tee/g'`
+				echo "Rename and saved $ii"
+				adb -s $sn shell "su -c 'dd if=/dev/block/by-name/$i of=/sdcard/$ii.img'" 2> /dev/null
+				adb -s $sn pull /sdcard/$ii.img ./$Mybackup_folder > /dev/null
+				adb -s $sn shell rm /sdcard/$ii.img
+				#du -sh ./$Mybackup_folder/$ii.img | awk '{print $1}'
+			elif [[ $i = super ]]; then
+				echo "The Super.img is bigger, wait..."
+				adb -s $sn shell dd "su -c 'if=/dev/block/by-name/$i of=/sdcard/$i.img'" 2> /dev/null
+				adb -s $sn pull /sdcard/$i.img ./$Mybackup_folder > /dev/null
+				adb -s $sn shell rm /sdcard/$i.img
+			elif [[ $i = logo ]]; then
+				adb -s $sn shell "su -c 'dd if=/dev/block/by-name/$i of=/sdcard/$i.bin'" 2> /dev/null
+				adb -s $sn pull /sdcard/$i.bin ./$Mybackup_folder > /dev/null
+				adb -s $sn shell rm /sdcard/$i.bin	
+			else
+				adb -s $sn shell "su -c 'dd if=/dev/block/by-name/$i of=/sdcard/$i.img'" 2> /dev/null
+				adb -s $sn pull /sdcard/$i.img ./$Mybackup_folder > /dev/null
+				adb -s $sn shell rm /sdcard/$i.img
+				#echo "$i"
+			fi
+			echo -e "\e[32mcompleted\e[0m"
+			c=$(($c+1))
+			
+			
+		else
+			echo " ===> skip" >/dev/null
+			
+		fi
+		sleep 1
+	done
+	size=`du -h ./$Mybackup_folder | awk '{print $1}'`
+	echo "Files saved in $Mybackup_folder folder, size:$size"
+	echo -e  "\e[32mDone\e[0m"
+else
+	total=`ls /dev/block/by-name/ | wc -l`
+	echo "Total $total partitions."
+	echo "Collect the necessary partitions..."
+	iii=$(ls /dev/block/by-name/)
+	c=1
+	for i in $iii
+	do	
+		if [[ $i = audio_dsp || $i = boot || $i = cam_vpu1 || \
+		$i = cam_vpu2 || $i = cam_vpu3 || $i = cdt_engineering || \
+		$i = dpm_1 || $i = dtbo || $i = gz1 || \
+		$i = lk || $i = logo || $i = mcupm_1 || \
+		$i = md1img || $i = my_custom || $i = opporeserve2 || \
+		$i = pi_img || $i = preloader_a || $i = recovery || \
+		$i = scp1 || $i = special_preload || $i = spmfw || \
+		$i = sspm_1 || $i = super || $i = tee1 || \
+		$i = vbmeta || $i = vbmeta_system || $i = vbmeta_vendor ]]; then
+			echo "$c. $i found"
+			sleep 1
+			ii=""
+			if [[ $i = dpm_1 ]]; then
+				ii=`echo $i |sed 's/dpm_1/dpm/g'`
+				echo "Rename and saved $ii"
+				dd if=/dev/block/by-name/$i of=./$Mybackup_folder/$ii.img 2> /dev/null
+			elif [[ $i = preloader_a ]]; then
+				ii=`echo $i |sed 's/preloader_a/preloader/g'`
+				echo "Rename and saved $ii"
+				dd if=/dev/block/by-name/$i of=./$Mybackup_folder/preloader_oppo6889.bin 2> /dev/null
+			elif [[ $i = gz1 ]]; then
+				ii=`echo $i |sed 's/gz1/gz/g'`
+				echo "Rename and saved $ii"
+				dd if=/dev/block/by-name/$i of=./$Mybackup_folder/$ii.img 2> /dev/null
+			elif [[ $i = mcupm_1 ]]; then
+				ii=`echo $i |sed 's/mcupm_1/mcupm/g'`
+				echo "Rename and saved $ii"
+				dd if=/dev/block/by-name/$i of=./$Mybackup_folder/$ii.img 2> /dev/null
+			elif [[ $i = scp1 ]]; then
+				ii=`echo $i |sed 's/scp1/scp/g'`
+				echo "Rename and saved $ii"
+				dd if=/dev/block/by-name/$i of=./$Mybackup_folder/$ii.img 2> /dev/null
+			elif [[ $i = sspm_1 ]]; then
+				ii=`echo $i |sed 's/sspm_1/sspm/g'`
+				echo "Rename and saved $ii"
+				dd if=/dev/block/by-name/$i of=./$Mybackup_folder/$ii.img 2> /dev/null
+			elif [[ $i = tee1 ]]; then
+				ii=`echo $i |sed 's/tee1/tee/g'`
+				echo "Rename and saved $ii"
+				dd if=/dev/block/by-name/$i of=./$Mybackup_folder/$ii.img 2> /dev/null				
+			elif [[ $i = super ]]; then
+				echo "The Super.img is bigger, wait..."
+				dd if=/dev/block/by-name/$i of=./$Mybackup_folder/$i.img 2> /dev/null
+			elif [[ $i = logo ]]; then
+				dd if=/dev/block/by-name/$i of=./$Mybackup_folder/$i.bin 2> /dev/null
+			else
+				dd if=/dev/block/by-name/$i of=./$Mybackup_folder/$i.img 2> /dev/null
+			fi
+			echo -e "\e[32mcompleted\e[0m"
+			c=$(($c+1))
+				
+		else
+			echo " ===> skip" >/dev/null
+			
+		fi
+		sleep 1
+	done
+	size=`du -h ./$Mybackup_folder | awk '{print $1}'`
+	echo "Files saved in $Mybackup_folder folder, size:$size"
+	echo -e  "\e[32mDone\e[0m"
+
+fi
 }
 
 flash_recovery(){
@@ -963,12 +1062,27 @@ phoneinfo()
 	battery_level=`adb -s $sn shell dumpsys battery| grep level | sed 's/^.*level: //g'`
 
 }
+phoneinfo_arm64()
+{
+	market_name=`getprop ro.oppo.market.name`
+	ui_version=`getprop ro.build.version.realmeui`
+	odm=`getprop ro.product.odm.device`
+	band=`getprop gsm.version.baseband`
+	vendor_rom=`getprop ro.vendor.build.id`
+	product_build=`getprop ro.product.build.id`
+	product_UIversion=`getprop ro.build.display.id`
+	vendor_rom_OS=`getprop ro.build.version.release`
+	battery_level=`dumpsys battery| grep level | sed 's/^.*level: //g'`
+
+}
 
 phone_info_out(){
 	printf "Check root:"
 	echo -e "\e[32m$check_root \e[0m"
-	if [[ $market_name == ""  ]];then
+	if [[ $market_name == "" && $platform == "x86_64" ]];then
 		market_name=`adb -s $sn shell getprop ro.vendor.oplus.market.name`
+		else
+		market_name=`getprop ro.vendor.oplus.market.name`
 	fi
 	printf "Market name:"
 	echo -e "\e[32m$market_name \e[0m"
@@ -1067,7 +1181,6 @@ echo -e "\e[33mStart tool time：\033[1;36m`date '+%d-%m-%Y %H:%M:%S'`\e[0m"
 		echo -e "\e[33mModel is not match,exit.\e[0m"
 		exit 1
 	fi
-		
 		if [[ `adb -s $sn shell which su` == "" ]];then
 			check_root="not root"
 		elif [[ `adb -s $sn shell "su -c 'whoami'"` == "root" ]];then
@@ -1089,6 +1202,32 @@ echo -e "\e[33mStart tool time：\033[1;36m`date '+%d-%m-%Y %H:%M:%S'`\e[0m"
 		exit 1
 		
 	fi
+}
+check_model_arm64(){
+echo -e "\e[33mStart tool time：\033[1;36m`date '+%d-%m-%Y %H:%M:%S'`\e[0m"
+device=`getprop ro.product.device`
+if [[ $device == "RMX2121" || $device == "RMX2121CN" || $device == "RMX2121TW" || $device == "RMX2121L1" || $device == "RMX2121PU" ]];then
+	vendor_rom_OS=`getprop ro.build.version.release`
+	if [[ $vendor_rom_OS -le 10 ]];then
+		echo -e "\e[31mYour device OS not support,please manually update to android  11.\n\e[0m"
+		echo -e "\e[31m你的裝置系統不支持，請手動更新系統版本至android 11。\n\e[0m"
+		exit 1
+	fi
+else
+	echo -e "\e[33mModel is not match,exit.\e[0m"
+	exit 1
+fi
+
+if [[ `which su` == "" ]];then
+	check_root="not root"
+elif [[ `whoami` == "root" ]];then
+	check_root="rooted"
+else
+	check_root="not root"
+fi
+	phoneinfo_arm64 $sn
+	#main_arm64
+
 }
 
 ota_path(){
@@ -1188,46 +1327,85 @@ do
 	 
 done
 }
-
-if [ -z "$1" ];then	
-	maintop
-else
-	if [[ "$1" == "" || "$1" == "-h" || "$1" == "--h" || "$1" == "-help" ]];then
-		clear
-		myhelp
-		rom_download_link
-	elif [[ "$1" == "--info" || "$1" == "-I" ]];then
-		check_model
-		phone_info_out
-	elif [[ "$1" == "--flashos" || "$1" == "-FO" ]];then
-		check_model
-		foldercheck_
-		flash_rom
-	elif [[ "$1" == "--backup" || "$1" == "-B" ]];then
-		check_model
-		backup_all_img
-	elif [[ "$1" == "--clone" || "$1" == "-C" ]];then
-		check_model
-		clone_image
-		echo -e "\e[33mPlease remeber to change folder name.\e[0m"
-	elif [[ "$1" == "--flashre" || "$1" == "-R" ]];then
-		check_model
-		flash_recovery
-	elif [[ "$1" == "--flashfs" || "$1" == "-FF" ]];then
-		check_model
-		flash_fastboot
-	elif [[ "$1" == "--link" || "$1" == "-L" ]];then
-		rom_download_link
-	elif [[ "$1" == "--pkg" || "$1" == "-P" ]];then
-		ota_path
-	elif [[ "$1" == "--boot" || "$1" == "-b" ]];then
-		check_model
-		flash_official_boot
+main_arm64(){
+while [[ true ]]
+do
+	if [[ $check_root == "rooted" ]];then
+		echo -e "==========================="
+		echo -e "1.Backup partitions"
+		echo -e "2.Clone OS version of realmeUI"
+		read choise"?What are you going to do? (q button:exit.):"
+		if [[ $choise == q || $choise == Q ]];then
+			echo -e "\e[33mExit\e[0m"
+			exit 1
+		elif [[ $choise == "1" ]];then
+			backup_all_img
+		elif [[ $choise == "2" ]];then
+			clone_image
+		else
+			echo -e "\e[31mInput error\e[0m"
+		fi
+		
 		
 	else
-		clear
-		myhelp
-		rom_download_link
+		phone_info_out
+		exit 1
+	fi
+done
+
+}
+
+if [ -z "$1" ];then
+platform=`uname -m`
+	if [[  $platform == "x86_64" ]];then
+		maintop
+	else
+		check_model_arm64
+		phone_info_out
+		main_arm64
 	fi
 	
+else
+	if [[ $platform == "x86_64" ]];then
+		if [[ "$1" == "" || "$1" == "-h" || "$1" == "--h" || "$1" == "-help" ]];then
+			clear
+			myhelp
+			rom_download_link
+		elif [[ "$1" == "--info" || "$1" == "-I" ]];then
+			check_model
+			phone_info_out
+		elif [[ "$1" == "--flashos" || "$1" == "-FO" ]];then
+			check_model
+			foldercheck_
+			flash_rom
+		elif [[ "$1" == "--backup" || "$1" == "-B" ]];then
+			check_model
+			backup_all_img
+		elif [[ "$1" == "--clone" || "$1" == "-C" ]];then
+			check_model
+			clone_image
+			echo -e "\e[33mPlease remeber to change folder name.\e[0m"
+		elif [[ "$1" == "--flashre" || "$1" == "-R" ]];then
+			check_model
+			flash_recovery
+		elif [[ "$1" == "--flashfs" || "$1" == "-FF" ]];then
+			check_model
+			flash_fastboot
+		elif [[ "$1" == "--link" || "$1" == "-L" ]];then
+			rom_download_link
+		elif [[ "$1" == "--pkg" || "$1" == "-P" ]];then
+			ota_path
+		elif [[ "$1" == "--boot" || "$1" == "-b" ]];then
+			check_model
+			flash_official_boot
+			
+		else
+			clear
+			myhelp
+			rom_download_link
+		fi
+	else
+		phone_info_out
+	
+	fi
 fi
