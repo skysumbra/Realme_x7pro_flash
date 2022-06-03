@@ -3,7 +3,7 @@
 -  目前支援的版本
 - CN C15
 - Global C06,C08:TW, MY, TH
-- Global F06:TW, MY, TH
+- Global F06,F09:TW, MY, TH
 
 ## 如何執行
 在linux 環境下用sh 執行
