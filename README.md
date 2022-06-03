@@ -5,6 +5,8 @@
 - Global C06,C08:TW, MY, TH
 - Global F06,F09:TW, MY, TH
 
+最新版本請直接下載程式碼
+
 ## 如何執行
 在linux 環境下用sh 執行
 ## 程式截圖
