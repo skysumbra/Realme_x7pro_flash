@@ -15,5 +15,5 @@
 1. [第三方整理包](https://realmefirmware.com/realme-x7-pro-5g-firmware/)
 2. [oppo_decrypt](https://github.com/bkerler/oppo_decrypt)
 3. Recovery
-- [TWRP](https://github.com/zeng-github01/android_device_realme_RMX2121-twrp/releases/), 支援C2X 以上
+- [TWRP](https://github.com/zeng-github01/twrp_device_realme_RMX2121/releases), 支援C2X 以上
 - [PBRP](https://github.com/PitchBlackRecoveryProject/android_device_realme_RMX2121-pbrp/releases/), 支援C1X 以上
