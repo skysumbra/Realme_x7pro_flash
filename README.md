@@ -8,7 +8,7 @@
 最新版本請直接下載程式碼
 
 ## 如何執行
-在linux 環境下用sh 執行
+在linux 環境下用sh 執行，預設所使用的環境是ADB 和Fastboot 
 ## 程式截圖
 ![](https://i.ibb.co/B466wkN/demo.png)
 ### 參考項目
