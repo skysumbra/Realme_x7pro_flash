@@ -307,11 +307,16 @@ flash_cnc15(){
 	echo "wait 3 sec..."
 	sleep 3
 	fastboot -s $sn flash preloader ./CNc15/preloader_oppo6889.bin
+	if [[ $ui_version == "V2.0" ]];then
+		fastboot -s $sn flash opporeserve2 ./CNc15/opporeserve2.img
+	else
+		echo "skip" > /dev/null
+	fi
 	fastboot -s $sn flash opporeserve2 ./CNc15/opporeserve2.img
+	fastboot -s $sn flash special_preload ./CNc15/special_preload.img
 	fastboot -s $sn flash vbmeta ./CNc15/vbmeta.img
 	fastboot -s $sn flash vbmeta_system ./CNc15/vbmeta_system.img
 	fastboot -s $sn flash vbmeta_vendor ./CNc15/vbmeta_vendor.img
-	fastboot -s $sn flash special_preload ./CNc15/special_preload.img
 	fastboot -s $sn flash my_custom ./CNc15/my_custom.img
 	fastboot -s $sn flash cdt_engineering ./CNc15/cdt_engineering.img
 	fastboot -s $sn flash md1img ./CNc15/md1img.img
@@ -581,16 +586,18 @@ case $1 in
 	;;
 	$choise)
 	product_UIversion=$choise
-	echo "Rebooting Device into Bootloader."
-	adb -s $sn reboot bootloader && sleep 20
-	fastboot -s $sn devices
+	if [[ $connect1 -gt 0 ]];then
+		fastboot devices
+	else
+		exit 1
+		echo "Rebooting Device into Bootloader."
+		adb -s $sn reboot bootloader && sleep 20
+		fastboot -s $sn devices
 	sleep 3
-	fastboot -s $sn flash preloader ./$product_UIversion/preloader_oppo6889.bin
-	fastboot -s $sn flash opporeserve2 ./$product_UIversion/opporeserve2.img
-	fastboot -s $sn flash vbmeta ./$product_UIversion/vbmeta.img
-	fastboot -s $sn flash vbmeta_system ./$product_UIversion/vbmeta_system.img
-	fastboot -s $sn flash vbmeta_vendor ./$product_UIversion/vbmeta_vendor.img
-	fastboot -s $sn flash special_preload ./$product_UIversion/special_preload.img
+	fi
+	#fastboot -s $sn flash preloader ./$product_UIversion/preloader_oppo6889.bin
+	#fastboot -s $sn flash opporeserve2 ./$product_UIversion/opporeserve2.img
+	#fastboot -s $sn flash special_preload ./$product_UIversion/special_preload.img
 	fastboot -s $sn flash my_custom ./$product_UIversion/my_custom.img
 	fastboot -s $sn flash cdt_engineering ./$product_UIversion/cdt_engineering.img
 	fastboot -s $sn flash md1img ./$product_UIversion/md1img.img
@@ -616,16 +623,11 @@ case $1 in
 	fastboot -s $sn flash dtbo ./$product_UIversion/dtbo.img
 	fastboot -s $sn flash tee1 ./$product_UIversion/tee.img
 	fastboot -s $sn flash tee2 ./$product_UIversion/tee.img
-	echo "Rebooting Device into Userspace Fastboot"
-	fastboot -s $sn reboot fastboot && sleep 20
-	fastboot -s $sn devices
-	sleep 3
 	fastboot -s $sn flash super ./$product_UIversion/super.img
-	echo "Rebooting Device into Bootloader."
-	adb -s $sn reboot bootloader && sleep 20
-	fastboot -s $sn devices
-	sleep 3
 	fastboot -s $sn flash boot ./$product_UIversion/boot.img
+	fastboot -s $sn flash vbmeta ./$product_UIversion/vbmeta.img
+	fastboot -s $sn flash vbmeta_system ./$product_UIversion/vbmeta_system.img
+	fastboot -s $sn flash vbmeta_vendor ./$product_UIversion/vbmeta_vendor.img
 	fastboot -s $sn flash recovery ./$product_UIversion/recovery.img
 	#fastboot -s $sn flash userdata ./$product_UIversion/userdata.img
 	fastboot -s $sn erase userdata
@@ -1172,15 +1174,15 @@ echo -e "\e[33mStart tool time：\033[1;36m`date '+%d-%m-%Y %H:%M:%S'`\e[0m"
 		device=`adb -s $sn shell getprop ro.product.device`
 		if [[ $device == "RMX2121" || $device == "RMX2121CN" || $device == "RMX2121TW" || $device == "RMX2121L1" || $device == "RMX2121PU" ]];then
 			vendor_rom_OS=`adb -s $sn shell getprop ro.build.version.release`
-		if [[ $vendor_rom_OS -le 10 ]];then
-			echo -e "\e[31mYour device OS not support,please manually update to android  11.\n\e[0m"
-			echo -e "\e[31m你的裝置系統不支持，請手動更新系統版本至android 11。\n\e[0m"
+			if [[ $vendor_rom_OS -le 10 ]];then
+				echo -e "\e[31mYour device OS not support,please manually update to android  11.\n\e[0m"
+				echo -e "\e[31m你的裝置系統不支持，請手動更新系統版本至android 11。\n\e[0m"
+				exit 1
+			fi
+		else
+			echo -e "\e[33mModel is not match,exit.\e[0m"
 			exit 1
 		fi
-	else
-		echo -e "\e[33mModel is not match,exit.\e[0m"
-		exit 1
-	fi
 		if [[ `adb -s $sn shell which su` == "" ]];then
 			check_root="not root"
 		elif [[ `adb -s $sn shell "su -c 'whoami'"` == "root" ]];then
@@ -1231,7 +1233,7 @@ fi
 }
 
 ota_path(){
-	echo "OTA link path"
+	echo "OTA DB file link path"
 	echo -e "\e[32mUI 1.0\e[0m"
 	echo "DB:/data/data/com.oppo.ota/databases/"
 	echo "ROM:/data/oppo/coloros/OTA/.otaPackage/"
@@ -1366,7 +1368,6 @@ platform=`uname -m`
 	fi
 	
 else
-	if [[ $platform == "x86_64" ]];then
 		if [[ "$1" == "" || "$1" == "-h" || "$1" == "--h" || "$1" == "-help" ]];then
 			clear
 			myhelp
@@ -1392,8 +1393,10 @@ else
 			check_model
 			flash_fastboot
 		elif [[ "$1" == "--link" || "$1" == "-L" ]];then
+			clear
 			rom_download_link
 		elif [[ "$1" == "--pkg" || "$1" == "-P" ]];then
+			clear
 			ota_path
 		elif [[ "$1" == "--boot" || "$1" == "-b" ]];then
 			check_model
@@ -1401,11 +1404,9 @@ else
 			
 		else
 			clear
+			echo "Not this command"
 			myhelp
-			rom_download_link
 		fi
-	else
-		phone_info_out
-	
-	fi
+
 fi
+
